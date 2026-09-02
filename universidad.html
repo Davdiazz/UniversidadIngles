@@ -472,8 +472,7 @@ tr:hover td { background: var(--panel); }
       </div>
       <div class="input-row">
         <textarea id="userInput" placeholder="Escriba su consulta..." rows="1" disabled></textarea>
-        <button class="icon-btn" id="imgBtn" onclick="document.getElementById('imgFile').click()" disabled>Adj.</button>
-        <button class="icon-btn" id="sendBtn" onclick="sendMsg()" disabled>Enviar</button>
+<button class="icon-btn" id="micBtn" onclick="toggleMic()">🎤</button>        <button class="icon-btn" id="sendBtn" onclick="sendMsg()" disabled>Enviar</button>
         <input type="file" id="imgFile" accept="image/*" style="display:none" onchange="onImg(event)">
       </div>
     </div>
@@ -623,6 +622,7 @@ tr:hover td { background: var(--panel); }
 </div><!-- /app -->
 
 <script>
+    
 /* ─── STATE ─── */
 let chatUrl = '', validatorUrl = '';
 let chatHistory = [], imgB64 = null, imgFileObj = null;
@@ -683,8 +683,8 @@ function setStatus(on) {
   el.className = 'status-pill ' + (on ? 'on' : 'off');
   el.textContent = on ? 'Conectado' : 'Sin conexión al webhook';
 }
-function enableChat()  { ['userInput','sendBtn','imgBtn'].forEach(id => document.getElementById(id).disabled = false); }
-function disableChat() { ['userInput','sendBtn','imgBtn'].forEach(id => document.getElementById(id).disabled = true); }
+function enableChat()  { ['userInput','sendBtn','micBtn'].forEach(id => document.getElementById(id).disabled = false); }
+function disableChat() { ['userInput','sendBtn','micBtn'].forEach(id => document.getElementById(id).disabled = true); }
 function onImg(e) {
   const f = e.target.files[0]; if (!f) return;
   imgFileObj = f;
@@ -1062,7 +1062,53 @@ function renderResults(data) {
   document.getElementById('tblWrap').style.display = 'block';
   updateWizFooter();
 }
+const STT_URL = 'http://localhost:8000/transcribe'; // cambia por tu URL real (o la de HF Space)
 
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+
+async function toggleMic() {
+  if (!isRecording) {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = async () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      await transcribirYEnviar(audioBlob);
+      stream.getTracks().forEach(t => t.stop());
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+    document.getElementById('micBtn').style.background = 'var(--danger)';
+  } else {
+    mediaRecorder.stop();
+    isRecording = false;
+    document.getElementById('micBtn').style.background = '';
+  }
+}
+
+async function transcribirYEnviar(audioBlob) {
+  showTyping();
+  try {
+    const fd = new FormData();
+    fd.append('audio', audioBlob, 'audio.webm');
+
+    const res = await fetch(STT_URL, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    hideTyping();
+    ui.value = data.text; // pone el texto transcrito en el input
+    sendMsg(); // lo envía como si el usuario lo hubiera escrito
+  } catch (e) {
+    hideTyping();
+    addMsg('Error transcribiendo audio: ' + e.message, false, true);
+  }
+}
 /* ─── DOWNLOAD ─── */
 function download() {
   if (!xlsxB64store) { alert('No hay archivo'); return; }
