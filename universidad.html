@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Departamento de Atención — PROSEGUR</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --paper: #f3ecd9;
+  --paper-dim: #ece2c9;
+  --panel: #f8f2e2;
+  --ledger: #fffcf3;
+  --ink: #2b2013;
+  --ink-soft: #55452e;
+  --muted: #8a7a5c;
+  --muted2: #b3a37e;
+  --rule: #c9b98d;
+  --rule-dim: #ddd1ab;
+  --maroon: #7a1f2a;
+  --maroon-dim: #a94a52;
+  --navy: #1e2c4f;
+  --gold: #9c7a28;
+  --gold-bright: #c79b31;
+  --success: #3f6b40;
+  --success-bg: #e7efdd;
+  --warn: #92600f;
+  --warn-bg: #f4e6c9;
+  --danger: #7a2320;
+  --danger-bg: #f3ddd6;
+  --card: #f9f4e6;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Source Serif 4', serif;
+  background: var(--paper);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background-image:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(122,31,42,.05), transparent),
+    radial-gradient(ellipse 700px 500px at 100% 100%, rgba(30,44,79,.05), transparent);
+}
+.app {
+  width: 100%; max-width: 980px; height: 96vh;
+  background: var(--ledger);
+  border: 1px solid var(--rule);
+  box-shadow: 0 2px 0 var(--rule), 0 30px 70px rgba(43,32,19,.25);
+  display: flex; flex-direction: column; overflow: hidden;
+  position: relative;
+}
+.app::before {
+  content: ''; position: absolute; inset: 6px;
+  border: 1px solid var(--rule-dim); pointer-events: none; z-index: 5;
+}
+
+/* HEADER */
+.header {
+  background: var(--panel);
+  border-bottom: 3px double var(--rule);
+  padding: 18px 26px 16px;
+  display: flex; align-items: center; gap: 16px;
+  position: relative; z-index: 2;
+}
+.seal {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--ledger);
+  border: 2px solid var(--maroon);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0; color: var(--maroon);
+  font-family: 'Fraunces', serif; font-weight: 700;
+}
+.header-title {
+  color: var(--ink); font-size: 19px; font-weight: 700;
+  font-family: 'Fraunces', serif; letter-spacing: .2px;
+}
+.header-sub {
+  color: var(--muted); font-size: 11px; margin-top: 3px;
+  letter-spacing: .5px; font-style: italic;
+}
+.status-pill {
+  margin-left: auto; padding: 6px 16px; border-radius: 3px;
+  font-size: 11.5px; font-weight: 600; font-family: 'Source Serif 4', serif;
+  border: 1px solid; transition: all .3s; letter-spacing: .3px;
+}
+.status-pill.on  { background: var(--success-bg); color: var(--success); border-color: #a9c69f; }
+.status-pill.off { background: var(--danger-bg); color: var(--danger); border-color: #d3a8a2; }
+
+/* TABS */
+.tabs { display: flex; border-bottom: 1px solid var(--rule); background: var(--panel); }
+.tab {
+  flex: 1; padding: 13px 16px; border: none; background: transparent;
+  font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600;
+  color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all .2s; letter-spacing: .2px;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--maroon); border-bottom-color: var(--maroon); background: var(--ledger); }
+.tab-pane { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.tab-pane.active { display: flex; }
+
+/* CONFIG BAR */
+.config-bar {
+  padding: 11px 20px; background: var(--panel);
+  border-bottom: 1px solid var(--rule);
+  display: flex; gap: 8px; align-items: center;
+}
+.config-bar label { font-size: 11.5px; color: var(--muted); white-space: nowrap; font-style: italic; }
+.config-bar input {
+  flex: 1; padding: 8px 12px;
+  background: var(--ledger); border: 1px solid var(--rule); border-radius: 3px;
+  font-size: 12.5px; font-family: 'Source Serif 4', serif; color: var(--ink);
+  outline: none;
+}
+.config-bar input:focus { border-color: var(--maroon); }
+.btn-sm {
+  padding: 8px 16px; background: var(--maroon); color: var(--ledger);
+  border: none; border-radius: 3px; font-size: 12.5px; font-weight: 600;
+  cursor: pointer; white-space: nowrap; font-family: 'Source Serif 4', serif;
+}
+.btn-sm:hover { background: #611720; }
+
+/* ────── CHAT ────── */
+.messages {
+  flex: 1; overflow-y: auto; padding: 22px 26px;
+  background: var(--paper); display: flex; flex-direction: column; gap: 13px;
+}
+.messages::-webkit-scrollbar { width: 4px; }
+.messages::-webkit-scrollbar-track { background: transparent; }
+.messages::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+.msg { display: flex; }
+.msg.user { justify-content: flex-end; }
+.msg-bubble {
+  max-width: 70%; padding: 12px 17px; border-radius: 3px;
+  font-size: 14.5px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;
+}
+.msg.user .msg-bubble {
+  background: var(--navy); color: var(--ledger);
+}
+.msg.bot .msg-bubble {
+  background: var(--card); color: var(--ink);
+  border: 1px solid var(--rule);
+}
+.msg.err .msg-bubble { background: var(--danger-bg); color: var(--danger); border: 1px solid #d3a8a2; }
+.typing { display: none; }
+.dots span {
+  display: inline-block; width: 6px; height: 6px;
+  background: var(--maroon); border-radius: 50%; margin: 0 2px;
+  animation: bop 1.2s infinite ease-in-out both;
+}
+.dots span:nth-child(1) { animation-delay: -.3s; }
+.dots span:nth-child(2) { animation-delay: -.15s; }
+@keyframes bop { 0%,80%,100%{transform:scale(.4)} 40%{transform:scale(1)} }
+.chat-input {
+  padding: 16px 20px; background: var(--panel); border-top: 1px solid var(--rule);
+}
+.img-preview-wrap { margin-bottom: 10px; display: none; }
+.rm-img { position: relative; display: inline-block; }
+.rm-img img { max-width: 140px; max-height: 110px; border-radius: 3px; border: 2px solid var(--maroon); }
+.rm-img button {
+  position: absolute; top: -6px; right: -6px; width: 20px; height: 20px;
+  background: var(--danger); color: #fff; border: none; border-radius: 50%;
+  cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center;
+}
+.input-row { display: flex; gap: 9px; align-items: flex-end; }
+textarea#userInput {
+  flex: 1; padding: 11px 16px;
+  background: var(--ledger); border: 1.5px solid var(--rule);
+  border-radius: 3px; font-size: 14.5px; font-family: 'Source Serif 4', serif;
+  color: var(--ink); outline: none; resize: none; min-height: 44px; max-height: 120px; line-height: 1.4;
+  transition: border-color .2s;
+}
+textarea#userInput::placeholder { color: var(--muted2); font-style: italic; }
+textarea#userInput:focus { border-color: var(--maroon); }
+textarea#userInput:disabled { opacity: .4; cursor: not-allowed; }
+.icon-btn {
+  width: 44px; height: 44px; border: 1.5px solid var(--rule); border-radius: 3px;
+  font-size: 16px; cursor: pointer; background: var(--ledger); color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.icon-btn:hover:not(:disabled) { border-color: var(--maroon); color: var(--maroon); }
+.icon-btn:disabled { opacity: .3; cursor: not-allowed; }
+#sendBtn { background: var(--maroon); color: var(--ledger); border-color: var(--maroon); }
+#sendBtn:hover:not(:disabled) { background: #611720; color: var(--ledger); }
+
+/* ────── WIZARD EXCEL ────── */
+.xl-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+.wiz-nav {
+  display: flex; gap: 0; background: var(--panel);
+  border-bottom: 1px solid var(--rule); padding: 0 20px;
+  overflow-x: auto;
+}
+.wiz-nav::-webkit-scrollbar { height: 3px; }
+.wiz-nav::-webkit-scrollbar-thumb { background: var(--rule); }
+.wstep {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 15px; font-size: 12.5px; font-weight: 600;
+  color: var(--muted); white-space: nowrap; position: relative;
+  transition: color .2s; font-family: 'Fraunces', serif;
+}
+.wstep::after {
+  content: '·'; margin-left: 8px; color: var(--muted2); font-size: 16px;
+}
+.wstep:last-child::after { display: none; }
+.wstep.done  { color: var(--success); }
+.wstep.active { color: var(--maroon); }
+.wstep .snum {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: transparent; color: var(--muted); border: 1.5px solid var(--rule);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10.5px; font-family: 'Source Serif 4', serif; font-weight: 700;
+  transition: all .3s;
+}
+.wstep.done  .snum { background: var(--success); color: #fff; border-color: var(--success); }
+.wstep.active .snum { background: var(--maroon); color: #fff; border-color: var(--maroon); }
+
+.wiz-body { flex: 1; overflow-y: auto; padding: 22px 26px; background: var(--paper); }
+.wiz-body::-webkit-scrollbar { width: 4px; }
+.wiz-body::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+
+.step-panel { display: none; animation: fadeUp .3s ease; }
+.step-panel.visible { display: block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+.step-title { font-size: 19px; font-weight: 700; color: var(--ink); margin-bottom: 5px; font-family: 'Fraunces', serif; }
+.step-sub { font-size: 13.5px; color: var(--muted); margin-bottom: 22px; font-style: italic; }
+
+/* STEP 1 — Upload */
+.drop-zone {
+  border: 1.5px dashed var(--rule);
+  border-radius: 4px; padding: 38px 24px; text-align: center;
+  cursor: pointer; position: relative; transition: all .25s;
+  background: var(--card);
+}
+.drop-zone:hover, .drop-zone.over {
+  background: var(--panel); border-color: var(--maroon);
+}
+.drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.drop-icon { font-size: 36px; margin-bottom: 10px; color: var(--maroon); }
+.drop-title { font-size: 15px; font-weight: 700; color: var(--ink); font-family: 'Fraunces', serif; }
+.drop-sub  { font-size: 12px; color: var(--muted); margin-top: 5px; font-style: italic; }
+
+.file-chip {
+  display: none; align-items: center; gap: 12px;
+  padding: 15px 18px;
+  background: var(--success-bg); border: 1px solid #a9c69f;
+  border-radius: 4px; font-size: 13.5px; color: var(--success);
+}
+.file-chip .fname { flex: 1; font-weight: 600; }
+.file-chip .rm { cursor: pointer; color: var(--danger); background: none; border: none; font-size: 18px; }
+
+/* STEP 2 — Select sheet */
+.sheet-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.sheet-card {
+  padding: 14px 20px; background: var(--card);
+  border: 1.5px solid var(--rule); border-radius: 4px;
+  cursor: pointer; transition: all .2s; font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
+  display: flex; align-items: center; gap: 10px;
+}
+.sheet-card:hover  { border-color: var(--maroon); background: var(--panel); }
+.sheet-card.sel { border-color: var(--maroon); color: var(--maroon); background: var(--panel); }
+.sheet-info { font-size: 10.5px; color: var(--muted); margin-top: 3px; font-style: italic; }
+
+/* STEP 3 — Select column */
+.col-search {
+  width: 100%; padding: 11px 16px;
+  background: var(--ledger); border: 1.5px solid var(--rule); border-radius: 4px;
+  font-size: 13.5px; font-family: 'Source Serif 4', serif; color: var(--ink);
+  outline: none; margin-bottom: 13px;
+}
+.col-search:focus { border-color: var(--maroon); }
+.col-search::placeholder { color: var(--muted2); font-style: italic; }
+.col-grid { display: flex; flex-wrap: wrap; gap: 8px; max-height: 260px; overflow-y: auto; }
+.col-grid::-webkit-scrollbar { width: 3px; }
+.col-grid::-webkit-scrollbar-thumb { background: var(--rule); }
+.col-chip {
+  padding: 9px 15px; background: var(--card);
+  border: 1.5px solid var(--rule); border-radius: 3px;
+  cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--ink-soft);
+  transition: all .2s;
+}
+.col-chip:hover  { border-color: var(--navy); color: var(--navy); }
+.col-chip.sel { border-color: var(--navy); color: var(--navy); background: var(--panel); }
+
+/* STEP 4 — Source + Rules */
+.source-grid { display: flex; flex-direction: column; gap: 12px; }
+.src-card {
+  padding: 15px 18px; background: var(--card);
+  border: 1.5px solid var(--rule); border-radius: 4px; cursor: pointer; transition: all .2s;
+}
+.src-card:hover { border-color: var(--navy); }
+.src-card.sel { border-color: var(--navy); background: var(--panel); }
+.src-title { font-size: 14px; font-weight: 700; color: var(--ink); font-family: 'Fraunces', serif; }
+.src-sub   { font-size: 12px; color: var(--muted); margin-top: 4px; font-style: italic; }
+.rules-label { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-top: 18px; margin-bottom: 7px; font-style: italic; }
+textarea#vRules {
+  width: 100%; padding: 11px 15px;
+  background: var(--ledger); border: 1.5px solid var(--rule); border-radius: 4px;
+  font-size: 13.5px; font-family: 'Source Serif 4', serif; color: var(--ink);
+  outline: none; resize: vertical; min-height: 80px;
+}
+textarea#vRules:focus { border-color: var(--maroon); }
+textarea#vRules::placeholder { color: var(--muted2); font-style: italic; }
+
+/* webhook step */
+.wh-input-row { display: flex; gap: 8px; margin-top: 4px; }
+.wh-input-row input {
+  flex: 1; padding: 11px 14px;
+  background: var(--ledger); border: 1.5px solid var(--rule); border-radius: 4px;
+  font-size: 13px; font-family: 'Source Serif 4', serif; color: var(--ink); outline: none;
+}
+.wh-input-row input:focus { border-color: var(--maroon); }
+.wh-input-row input::placeholder { color: var(--muted2); font-style: italic; }
+.btn-save-wh {
+  padding: 11px 20px; background: var(--maroon); color: var(--ledger);
+  border: none; border-radius: 4px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: 'Source Serif 4', serif;
+}
+.btn-save-wh:hover { background: #611720; }
+
+/* STEP 5 — Processing */
+.proc-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 280px; gap: 20px;
+}
+.proc-ring {
+  width: 58px; height: 58px; border-radius: 50%;
+  border: 3px solid var(--rule); border-top-color: var(--maroon);
+  animation: spin .9s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.proc-title { font-size: 17px; font-weight: 700; color: var(--ink); font-family: 'Fraunces', serif; text-align: center; }
+.proc-sub   { font-size: 12.5px; color: var(--muted); text-align: center; font-style: italic; margin-top: 3px; }
+.proc-steps { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; width: 100%; max-width: 380px; }
+.ps {
+  display: flex; align-items: center; gap: 10px; padding: 10px 15px;
+  border-radius: 4px; font-size: 12.5px; font-weight: 600;
+  transition: all .4s;
+}
+.ps.wait { color: var(--muted2); background: var(--card); border: 1px solid var(--rule-dim); }
+.ps.run  { color: var(--maroon); background: var(--panel); border: 1px solid var(--maroon-dim); }
+.ps.ok   { color: var(--success); background: var(--success-bg); border: 1px solid #a9c69f; }
+.ps-ico  { font-size: 14px; flex-shrink: 0; }
+
+/* STEP 6 — Results */
+.dl-banner {
+  padding: 19px 21px; background: var(--success-bg);
+  border: 1px solid #a9c69f; border-radius: 4px;
+  display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+}
+.dl-banner .dl-ico { font-size: 26px; }
+.dl-banner .dl-name { font-size: 15.5px; font-weight: 700; color: var(--success); font-family: 'Fraunces', serif; }
+.dl-banner .dl-meta { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; font-style: italic; }
+.btn-dl {
+  margin-left: auto; padding: 12px 26px;
+  background: var(--success);
+  color: #fff; border: none; border-radius: 3px;
+  font-family: 'Source Serif 4', serif; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; transition: transform .15s;
+}
+.btn-dl:hover { background: #345d35; }
+
+.summary-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 18px; }
+.scard {
+  background: var(--card); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 15px; text-align: center;
+}
+.scard .num { font-size: 27px; font-weight: 700; font-family: 'Fraunces', serif; }
+.scard .lbl { font-size: 10.5px; color: var(--muted); margin-top: 4px; font-style: italic; }
+.c-total .num { color: var(--navy); }
+.c-tip   .num { color: var(--maroon); }
+.c-ok    .num { color: var(--success); }
+.c-err   .num { color: var(--warn); }
+
+.tbl-wrap { background: var(--card); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th {
+  background: var(--panel);
+  color: var(--ink-soft); padding: 11px 14px; text-align: left;
+  font-size: 11px; font-weight: 700; letter-spacing: .3px;
+  border-bottom: 2px solid var(--rule); font-family: 'Fraunces', serif;
+}
+td {
+  padding: 11px 14px; border-bottom: 1px solid var(--rule-dim);
+  vertical-align: top; color: var(--ink); font-size: 12.5px;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--panel); }
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 3px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .3px;
+  border: 1px solid;
+}
+.b-ok   { background: var(--success-bg);  color: var(--success); border-color: #a9c69f; }
+.b-warn { background: var(--warn-bg);  color: var(--warn); border-color: #d9bd7c; }
+.b-err  { background: var(--danger-bg);   color: var(--danger); border-color: #d3a8a2; }
+.motivo-tag {
+  display: inline-block; padding: 3px 10px;
+  background: var(--panel); color: var(--navy);
+  border: 1px solid var(--rule); border-radius: 3px; font-size: 11.5px; font-weight: 600;
+}
+.no-data { text-align: center; color: var(--muted); padding: 30px; font-size: 13.5px; font-style: italic; }
+.verr {
+  display: none; padding: 15px 18px; margin-bottom: 15px;
+  background: var(--danger-bg); border-radius: 4px;
+  color: var(--danger); font-size: 13.5px; border-left: 3px solid var(--danger);
+}
+
+/* nav buttons */
+.wiz-footer {
+  padding: 15px 26px; background: var(--panel); border-top: 1px solid var(--rule);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.btn-back {
+  padding: 11px 24px; background: transparent;
+  border: 1.5px solid var(--rule); color: var(--muted);
+  border-radius: 3px; font-family: 'Source Serif 4', serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.btn-back:hover { border-color: var(--ink); color: var(--ink); }
+.btn-back:disabled { opacity: .3; cursor: not-allowed; }
+.btn-next {
+  padding: 11px 30px;
+  background: var(--maroon);
+  color: var(--ledger); border: none; border-radius: 3px;
+  font-family: 'Source Serif 4', serif; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+}
+.btn-next:hover:not(:disabled) { background: #611720; }
+.btn-next:disabled { opacity: .35; cursor: not-allowed; }
+.step-hint { font-size: 11.5px; color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="seal">P</div>
+    <div>
+      <div class="header-title">Departamento de Atención al Cliente</div>
+      <div class="header-sub">Sistema de Tipificación Asistida — PROSEGUR</div>
+    </div>
+    <div class="status-pill off" id="statusPill">Sin conexión al webhook</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('chat')">Consulta al copiloto</button>
+    <button class="tab"        onclick="switchTab('excel')">Tipificación de planillas</button>
+  </div>
+
+  <!-- ═══════════════════════ CHAT ═══════════════════════ -->
+  <div class="tab-pane active" id="pane-chat">
+    <div class="config-bar">
+      <label>Webhook de consulta ›</label>
+      <input type="text" id="webhookUrl" placeholder="http://localhost:5678/webhook/...">
+      <button class="btn-sm" onclick="saveChat()">Guardar</button>
+    </div>
+    <div class="messages" id="messages">
+      <div class="msg bot"><div class="msg-bubble">Bienvenido. Configure el webhook de N8N arriba para comenzar la sesión.</div></div>
+      <div class="msg bot typing" id="typing"><div class="msg-bubble"><div class="dots"><span></span><span></span><span></span></div></div></div>
+    </div>
+    <div class="chat-input">
+      <div class="img-preview-wrap" id="imgPreviewWrap">
+        <div class="rm-img"><img id="imgPreview" src="" alt=""><button onclick="rmImg()">×</button></div>
+      </div>
+      <div class="input-row">
+        <textarea id="userInput" placeholder="Escriba su consulta..." rows="1" disabled></textarea>
+        <button class="icon-btn" id="imgBtn" onclick="document.getElementById('imgFile').click()" disabled>Adj.</button>
+        <button class="icon-btn" id="sendBtn" onclick="sendMsg()" disabled>Enviar</button>
+        <input type="file" id="imgFile" accept="image/*" style="display:none" onchange="onImg(event)">
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ EXCEL WIZARD ═══════════════════════ -->
+  <div class="tab-pane" id="pane-excel">
+
+    <!-- step nav -->
+    <div class="wiz-nav">
+      <div class="wstep active" id="wnav-1"><div class="snum">1</div>Archivo</div>
+      <div class="wstep"        id="wnav-2"><div class="snum">2</div>Hoja</div>
+      <div class="wstep"        id="wnav-3"><div class="snum">3</div>Columna</div>
+      <div class="wstep"        id="wnav-4"><div class="snum">4</div>Fuente y reglas</div>
+      <div class="wstep"        id="wnav-5"><div class="snum">5</div>Procesando</div>
+      <div class="wstep"        id="wnav-6"><div class="snum">6</div>Resultado</div>
+    </div>
+
+    <!-- step body -->
+    <div class="wiz-body" id="wizBody">
+
+      <!-- ── STEP 1: Upload ── -->
+      <div class="step-panel visible" id="sp-1">
+        <div class="step-title">Cargar planilla</div>
+        <div class="step-sub">El archivo se lee en su navegador — ningún dato se envía hasta que confirme el paso 4.</div>
+
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-icon">▤</div>
+          <div class="drop-title">Haga clic o arrastre el archivo aquí</div>
+          <div class="drop-sub">Formato admitido: .xlsx — tamaño máximo 20 MB</div>
+          <input type="file" id="xlsxFile" accept=".xlsx" onchange="onFile(event)">
+        </div>
+        <div class="file-chip" id="fileChip">
+          <span>▤</span><span class="fname" id="chipName"></span>
+          <button class="rm" onclick="rmFile()">×</button>
+        </div>
+
+        <div style="margin-top:26px;">
+          <div class="step-title" style="font-size:15px;margin-bottom:9px;">Webhook de tipificación (N8N)</div>
+          <div class="wh-input-row">
+            <input type="text" id="vWebhook" placeholder="http://localhost:5678/webhook/consulta-manual">
+            <button class="btn-save-wh" onclick="saveValidator()">Guardar</button>
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:7px;font-style:italic;">
+            Se guarda en el navegador — solo debe configurarlo una vez.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: Sheet ── -->
+      <div class="step-panel" id="sp-2">
+        <div class="step-title">Selección de hoja</div>
+        <div class="step-sub" id="s2sub">Elija la hoja del archivo que desea modificar.</div>
+        <div class="sheet-grid" id="sheetGrid"></div>
+      </div>
+
+      <!-- ── STEP 3: Column ── -->
+      <div class="step-panel" id="sp-3">
+        <div class="step-title">Selección de columna</div>
+        <div class="step-sub" id="s3sub">Hoja seleccionada: <strong id="selSheetLabel" style="color:var(--maroon)">—</strong></div>
+        <input class="col-search" type="text" id="colSearch" placeholder="Buscar columna..." oninput="filterCols()" />
+        <div class="col-grid" id="colGrid"></div>
+      </div>
+
+      <!-- ── STEP 4: Source + Rules ── -->
+      <div class="step-panel" id="sp-4">
+        <div class="step-title">Fuente de información y reglas</div>
+        <div class="step-sub">Elija de dónde obtiene el copiloto la información y añada reglas particulares si aplica.</div>
+
+        <div class="source-grid">
+          <div class="src-card sel" id="src-pinecone" onclick="selSrc('pinecone')">
+            <div class="src-title">Base documental (Pinecone)</div>
+            <div class="src-sub">El copiloto consulta los documentos indexados para inferir el valor correcto.</div>
+          </div>
+          <div class="src-card" id="src-texto" onclick="selSrc('texto')">
+            <div class="src-title">Solo el texto de la planilla</div>
+            <div class="src-sub">El copiloto usa el contenido de las demás columnas de cada fila.</div>
+          </div>
+          <div class="src-card" id="src-ambas" onclick="selSrc('ambas')">
+            <div class="src-title">Ambas fuentes combinadas</div>
+            <div class="src-sub">Consulta primero la base documental y complementa con el contexto de la planilla.</div>
+          </div>
+        </div>
+
+        <div class="rules-label">Reglas adicionales (opcional)</div>
+        <textarea id="vRules" placeholder="Ej: Si el tipo es «Instalación» el submotivo debe ser «Dispositivo»...&#10;Ej: La columna Estado solo acepta: VALIDA, REQUIERE_CORRECCION, DEBE_CANCELARSE"></textarea>
+      </div>
+
+      <!-- ── STEP 5: Processing ── -->
+      <div class="step-panel" id="sp-5">
+        <div class="proc-wrap">
+          <div class="proc-ring" id="procRing"></div>
+          <div>
+            <div class="proc-title">Procesando planilla</div>
+            <div class="proc-sub" id="procSub">Preparando envío</div>
+          </div>
+          <div class="proc-steps">
+            <div class="ps wait" id="ps1"><span class="ps-ico">↳</span>Enviando archivo al servidor</div>
+            <div class="ps wait" id="ps2"><span class="ps-ico">↳</span>Extrayendo texto de la planilla</div>
+            <div class="ps wait" id="ps3"><span class="ps-ico">↳</span>Consultando base documental</div>
+            <div class="ps wait" id="ps4"><span class="ps-ico">↳</span>Tipificando filas</div>
+            <div class="ps wait" id="ps5"><span class="ps-ico">↳</span>Generando planilla final</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 6: Results ── -->
+      <div class="step-panel" id="sp-6">
+        <div class="verr" id="vErr"></div>
+
+        <div class="dl-banner" id="dlBanner" style="display:none">
+          <div class="dl-ico">✓</div>
+          <div>
+            <div class="dl-name" id="dlName">resultado.xlsx</div>
+            <div class="dl-meta" id="dlMeta">—</div>
+          </div>
+          <button class="btn-dl" onclick="download()">Descargar planilla</button>
+        </div>
+
+        <div class="summary-row" id="summary" style="display:none"></div>
+
+        <div class="tbl-wrap" id="tblWrap" style="display:none">
+          <table>
+            <thead><tr>
+              <th style="width:50px">Fila</th>
+              <th>Motivo asignado</th>
+              <th>Submotivo</th>
+              <th style="width:140px">Estado</th>
+              <th>Observación</th>
+            </tr></thead>
+            <tbody id="tBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /wiz-body -->
+
+    <!-- footer nav -->
+    <div class="wiz-footer" id="wizFooter">
+      <button class="btn-back" id="btnBack" onclick="wizBack()" disabled>← Atrás</button>
+      <span class="step-hint" id="stepHint">Paso 1 de 4</span>
+      <button class="btn-next" id="btnNext" onclick="wizNext()" disabled>Siguiente →</button>
+    </div>
+
+  </div><!-- /pane-excel -->
+
+</div><!-- /app -->
+
+<script>
+/* ─── STATE ─── */
+let chatUrl = '', validatorUrl = '';
+let chatHistory = [], imgB64 = null, imgFileObj = null;
+let xlsxFile = null, xlsxWorkbook = null, xlsxB64 = null, xlsxB64store = null, xlsxFilename = 'resultado.xlsx';
+let selectedSheet = null, selectedCol = null, selectedSrc = 'pinecone';
+let currentStep = 1;
+let allCols = [];
+let procTicker = null;
+
+const procStepMsgs = [
+  'Enviando archivo al servidor…',
+  'Extrayendo texto de la planilla…',
+  'Consultando base documental…',
+  'Tipificando filas…',
+  'Generando planilla final…'
+];
+
+/* ─── INIT ─── */
+window.onload = () => {
+  const cu = localStorage.getItem('chat_url');
+  if (cu) { document.getElementById('webhookUrl').value = cu; chatUrl = cu; setStatus(true); enableChat(); }
+  const vu = localStorage.getItem('validator_url');
+  if (vu) { document.getElementById('vWebhook').value = vu; validatorUrl = vu; }
+  updateWizNav();
+  updateWizFooter();
+
+  // Drag & drop
+  const dz = document.getElementById('dropZone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('over');
+    const f = e.dataTransfer.files[0];
+    if (f) { onFile({ target: { files: e.dataTransfer.files } }); }
+  });
+};
+
+/* ─── TAB SWITCH ─── */
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelector('.tab[onclick="switchTab(\''+t+'\')"]').classList.add('active');
+  document.getElementById('pane-'+t).classList.add('active');
+}
+
+/* ─── CHAT ─── */
+const ui = document.getElementById('userInput');
+ui.addEventListener('input', () => { ui.style.height = 'auto'; ui.style.height = Math.min(ui.scrollHeight, 120) + 'px'; });
+ui.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } });
+
+function saveChat() {
+  const u = document.getElementById('webhookUrl').value.trim();
+  if (!u.startsWith('http')) { alert('URL inválida'); return; }
+  chatUrl = u; localStorage.setItem('chat_url', u); setStatus(true); enableChat(); addMsg('Webhook guardado correctamente.', false);
+}
+function setStatus(on) {
+  const el = document.getElementById('statusPill');
+  el.className = 'status-pill ' + (on ? 'on' : 'off');
+  el.textContent = on ? 'Conectado' : 'Sin conexión al webhook';
+}
+function enableChat()  { ['userInput','sendBtn','imgBtn'].forEach(id => document.getElementById(id).disabled = false); }
+function disableChat() { ['userInput','sendBtn','imgBtn'].forEach(id => document.getElementById(id).disabled = true); }
+function onImg(e) {
+  const f = e.target.files[0]; if (!f) return;
+  imgFileObj = f;
+  const r = new FileReader();
+  r.onload = ev => { imgB64 = ev.target.result; document.getElementById('imgPreview').src = imgB64; document.getElementById('imgPreviewWrap').style.display = 'block'; };
+  r.readAsDataURL(f);
+}
+function rmImg() { imgFileObj = null; imgB64 = null; document.getElementById('imgFile').value = ''; document.getElementById('imgPreviewWrap').style.display = 'none'; }
+function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function addMsg(text, isUser, isErr = false) {
+  const msgs = document.getElementById('messages');
+  const typing = document.getElementById('typing');
+  const d = document.createElement('div');
+  d.className = 'msg ' + (isUser ? 'user' : isErr ? 'err' : 'bot');
+  d.innerHTML = '<div class="msg-bubble">' + escH(text) + '</div>';
+  msgs.insertBefore(d, typing);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function showTyping() { document.getElementById('typing').style.display = 'flex'; document.getElementById('messages').scrollTop = 9999; }
+function hideTyping() { document.getElementById('typing').style.display = 'none'; }
+function getSid() { let s = localStorage.getItem('sid'); if (!s) { s = 'sid_'+Date.now(); localStorage.setItem('sid', s); } return s; }
+async function sendMsg() {
+  const msg = ui.value.trim();
+  if (!msg && !imgFileObj) return; if (!chatUrl) return;
+  addMsg(msg || 'Imagen adjunta', true);
+  ui.value = ''; ui.style.height = 'auto';
+  disableChat(); showTyping();
+  try {
+    const body = { message: msg||'Analiza esta imagen', sessionId: getSid(), conversationHistory: chatHistory };
+    if (imgB64) { body.image = imgB64; body.hasImage = true; }
+    const res = await fetch(chatUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const reply = data.response || data.message || data.text || JSON.stringify(data);
+    hideTyping(); addMsg(reply, false);
+    chatHistory.push({ role: 'user', content: msg }, { role: 'assistant', content: reply });
+    if (imgFileObj) rmImg();
+  } catch(e) { hideTyping(); addMsg('Error: ' + e.message, false, true); }
+  finally { enableChat(); }
+}
+
+/* ─── VALIDATOR / EXCEL WIZARD ─── */
+
+function saveValidator() {
+  const u = document.getElementById('vWebhook').value.trim();
+  if (!u.startsWith('http')) { alert('URL inválida'); return; }
+  validatorUrl = u; localStorage.setItem('validator_url', u);
+  alert('URL guardada');
+  updateWizFooter();
+}
+
+function onFile(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  if (f.size > 20 * 1024 * 1024) { alert('Máximo 20 MB'); return; }
+
+  xlsxFile = f;
+  xlsxFilename = f.name.replace(/\.xlsx$/i, '') + '_tipificado.xlsx';
+  document.getElementById('chipName').textContent = f.name + ' (' + (f.size / 1024).toFixed(0) + ' KB)';
+  document.getElementById('dropZone').style.display = 'none';
+  document.getElementById('fileChip').style.display = 'flex';
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const arrayBuffer = ev.target.result;
+
+      // ── Guardar base64 ──
+      const bytes = new Uint8Array(arrayBuffer);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      xlsxB64 = btoa(bin);
+
+      // ── Parsear workbook ──
+      xlsxWorkbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+      // ── Construir grids DESPUÉS de tener el workbook ──
+      buildSheetGrid();
+      updateWizFooter();
+
+    } catch (err) {
+      alert('Error leyendo el archivo: ' + err.message);
+      rmFile();
+    }
+  };
+  reader.onerror = () => { alert('No se pudo leer el archivo'); rmFile(); };
+  reader.readAsArrayBuffer(f);
+}
+
+function rmFile() {
+  xlsxFile = null; xlsxWorkbook = null; xlsxB64 = null;
+  document.getElementById('xlsxFile').value = '';
+  document.getElementById('dropZone').style.display = 'block';
+  document.getElementById('fileChip').style.display = 'none';
+  selectedSheet = null; selectedCol = null;
+  document.getElementById('sheetGrid').innerHTML = '';
+  document.getElementById('colGrid').innerHTML = '';
+  updateWizFooter();
+}
+
+function buildSheetGrid() {
+  const wb = xlsxWorkbook;
+  if (!wb) return;
+
+  const grid = document.getElementById('sheetGrid');
+  const sub  = document.getElementById('s2sub');
+  grid.innerHTML = '';
+
+  sub.textContent = 'Se encontraron ' + wb.SheetNames.length + ' hoja(s). Seleccione la que desea modificar.';
+
+  wb.SheetNames.forEach(name => {
+    const ws = wb.Sheets[name];
+    let rows = 0, cols = 0;
+
+    if (ws['!ref']) {
+      const range = XLSX.utils.decode_range(ws['!ref']);
+      rows = Math.max(0, range.e.r - range.s.r); // filas de datos (sin header)
+      cols = range.e.c - range.s.c + 1;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'sheet-card';
+    card.innerHTML =
+      '<span>▤</span><div>' +
+        '<div>' + escH(name) + '</div>' +
+        '<div class="sheet-info">' + rows + ' filas · ' + cols + ' columnas</div>' +
+      '</div>';
+
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.sheet-card').forEach(c => c.classList.remove('sel'));
+      card.classList.add('sel');
+      selectedSheet = name;
+      buildColGrid(name);
+      document.getElementById('selSheetLabel').textContent = name;
+      updateWizFooter();
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+function buildColGrid(sheetName) {
+  const ws = xlsxWorkbook.Sheets[sheetName];
+  allCols = [];
+
+  if (ws['!ref']) {
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let c = range.s.c; c <= range.e.c; c++) {
+      const cellAddr = XLSX.utils.encode_cell({ r: range.s.r, c });
+      const cell = ws[cellAddr];
+      const label = cell ? String(cell.v).trim() : ('Col_' + (c + 1));
+      allCols.push(label || ('Col_' + (c + 1)));
+    }
+  }
+
+  // Limpiar selección de columna si la hoja cambió
+  selectedCol = null;
+  renderColGrid(allCols);
+  updateWizFooter();
+}
+
+function renderColGrid(cols) {
+  const grid = document.getElementById('colGrid');
+  grid.innerHTML = '';
+  if (cols.length === 0) {
+    grid.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:12px;font-style:italic;">No se encontraron columnas en esta hoja.</div>';
+    return;
+  }
+  cols.forEach(name => {
+    const chip = document.createElement('div');
+    chip.className = 'col-chip' + (selectedCol === name ? ' sel' : '');
+    chip.textContent = name;
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.col-chip').forEach(c => c.classList.remove('sel'));
+      chip.classList.add('sel');
+      selectedCol = name;
+      updateWizFooter();
+    });
+    grid.appendChild(chip);
+  });
+}
+
+function filterCols() {
+  const q = document.getElementById('colSearch').value.toLowerCase();
+  renderColGrid(allCols.filter(n => n.toLowerCase().includes(q)));
+}
+
+/* Source selection */
+function selSrc(src) {
+  selectedSrc = src;
+  ['pinecone','texto','ambas'].forEach(s => {
+    document.getElementById('src-'+s).classList.toggle('sel', s === src);
+  });
+}
+
+/* ─── WIZARD NAVIGATION ─── */
+function showStep(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('visible'));
+  document.getElementById('sp-'+n).classList.add('visible');
+  currentStep = n;
+  updateWizNav();
+  updateWizFooter();
+  document.getElementById('wizBody').scrollTop = 0;
+}
+
+function updateWizNav() {
+  for (let i = 1; i <= 6; i++) {
+    const el = document.getElementById('wnav-'+i);
+    el.classList.remove('active','done');
+    if (i < currentStep) el.classList.add('done');
+    else if (i === currentStep) el.classList.add('active');
+  }
+}
+
+function updateWizFooter() {
+  const back   = document.getElementById('btnBack');
+  const next   = document.getElementById('btnNext');
+  const hint   = document.getElementById('stepHint');
+  const footer = document.getElementById('wizFooter');
+
+  if (currentStep === 5) { footer.style.display = 'none'; return; }
+  footer.style.display = 'flex';
+
+  back.disabled = (currentStep <= 1);
+
+  if (currentStep === 6) {
+    next.textContent = 'Nuevo análisis';
+    next.disabled = false;
+    hint.textContent = 'Análisis completo';
+    return;
+  }
+
+  next.textContent = currentStep === 4 ? 'Tipificar y validar' : 'Siguiente →';
+
+  const canNext = (() => {
+    if (currentStep === 1) return !!(xlsxFile && xlsxWorkbook && validatorUrl);
+    if (currentStep === 2) return !!selectedSheet;
+    if (currentStep === 3) return !!selectedCol;
+    if (currentStep === 4) return true;
+    return false;
+  })();
+  next.disabled = !canNext;
+
+  const labels = ['', 'Paso 1: Archivo', 'Paso 2: Hoja', 'Paso 3: Columna', 'Paso 4: Fuente y reglas'];
+  hint.textContent = labels[currentStep] || '';
+}
+
+function wizBack() {
+  if (currentStep > 1 && currentStep !== 5) showStep(currentStep - 1);
+}
+
+function wizNext() {
+  if (currentStep === 6) { resetWizard(); return; }
+  if (currentStep < 4)  { showStep(currentStep + 1); return; }
+  if (currentStep === 4) { runValidation(); }
+}
+
+function resetWizard() {
+  rmFile();
+  selectedSheet = null; selectedCol = null; selectedSrc = 'pinecone';
+  document.getElementById('vRules').value = '';
+  document.getElementById('dlBanner').style.display = 'none';
+  document.getElementById('summary').style.display = 'none';
+  document.getElementById('tblWrap').style.display = 'none';
+  document.getElementById('vErr').style.display = 'none';
+  xlsxB64store = null;
+  selSrc('pinecone');
+  showStep(1);
+}
+
+/* ─── RUN ─── */
+async function runValidation() {
+  if (!xlsxFile || !validatorUrl) return;
+  showStep(5);
+
+  let si = 0;
+  function advanceProc() {
+    if (si > 0 && si <= 5) document.getElementById('ps'+si).className = 'ps ok';
+    si++;
+    if (si <= 5) {
+      document.getElementById('ps'+si).className = 'ps run';
+      document.getElementById('procSub').textContent = procStepMsgs[si-1];
+    }
+  }
+  advanceProc();
+  procTicker = setInterval(advanceProc, 3800);
+
+  try {
+    const rules = document.getElementById('vRules').value.trim();
+    const fd = new FormData();
+    fd.append('data', xlsxFile);
+    fd.append('reglas', rules);
+    fd.append('hoja', selectedSheet || '');
+    fd.append('columna', selectedCol || '');
+    fd.append('fuente', selectedSrc);
+
+    const res = await fetch(validatorUrl, { method: 'POST', body: fd });
+    clearInterval(procTicker);
+    for (let i = 1; i <= 5; i++) document.getElementById('ps'+i).className = 'ps ok';
+
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' — revise el flujo en n8n');
+    const data = await res.json();
+    showStep(6);
+    renderResults(data);
+  } catch(e) {
+    clearInterval(procTicker);
+    showStep(6);
+    const err = document.getElementById('vErr');
+    err.style.display = 'block';
+    err.textContent = 'Error: ' + e.message;
+    updateWizFooter();
+  }
+}
+
+/* ─── RENDER RESULTS ─── */
+function renderResults(data) {
+  const resumen = data.resumen || data.resumen_general || {};
+  const filas   = data.filas_preview || data.filas_procesadas || [];
+
+  const norm = filas.map(f => ({
+    fila:        f.fila        || f.numero_fila                || '—',
+    motivo:      f.motivo      || f.motivo_sugerido            || '—',
+    submotivo:   f.submotivo   || f.submotivo_sugerido         || '—',
+    estado:      f.estado                                      || 'VALIDA',
+    observacion: f.observacion || f.correccion_sugerida        || ''
+  }));
+
+  if (data.xlsx_base64) {
+    xlsxB64store = data.xlsx_base64;
+    const fname = data.filename || xlsxFilename;
+    document.getElementById('dlName').textContent = fname;
+    document.getElementById('dlMeta').textContent =
+      (resumen.total_filas || norm.length || '?') + ' filas · ' +
+      (resumen.tipificadas || 0) + ' tipificadas · ' +
+      (resumen.con_error || 0) + ' con error · columna: ' + (selectedCol || '—');
+    document.getElementById('dlBanner').style.display = 'flex';
+  }
+
+  const sumEl = document.getElementById('summary');
+  sumEl.style.display = 'grid';
+  sumEl.innerHTML = `
+    <div class="scard c-total"><div class="num">${resumen.total_filas || norm.length || '?'}</div><div class="lbl">Total filas</div></div>
+    <div class="scard c-tip"  ><div class="num">${resumen.tipificadas || 0}</div><div class="lbl">Tipificadas</div></div>
+    <div class="scard c-ok"   ><div class="num">${resumen.validas || resumen.valid || 0}</div><div class="lbl">Válidas</div></div>
+    <div class="scard c-err"  ><div class="num">${resumen.con_error || resumen.errores || 0}</div><div class="lbl">Con error</div></div>
+  `;
+
+  const tbody = document.getElementById('tBody');
+  if (norm.length > 0) {
+    tbody.innerHTML = norm.slice(0, 100).map(row => {
+      const e = (row.estado || 'VALIDA').toUpperCase().replace(/ /g,'_');
+      let bc = 'b-ok';
+      if (e.includes('CORREC')) bc = 'b-warn';
+      if (e.includes('CANCEL') || e.includes('ERROR')) bc = 'b-err';
+      const mot = row.motivo !== '—'
+        ? '<span class="motivo-tag">'+escH(row.motivo)+'</span>'
+        : '<span style="color:var(--muted2)">—</span>';
+      const sub = row.submotivo !== '—' ? escH(row.submotivo) : '<span style="color:var(--muted2)">—</span>';
+      const obs = row.observacion
+        ? '<span style="color:var(--muted);font-style:italic">'+escH(row.observacion)+'</span>'
+        : '<span style="color:var(--muted2)">—</span>';
+      return `<tr>
+        <td style="font-weight:700;text-align:center;color:var(--maroon);font-family:'Fraunces',serif">${row.fila}</td>
+        <td>${mot}</td><td>${sub}</td>
+        <td><span class="badge ${bc}">${escH(row.estado||'VÁLIDA').replace(/_/g,' ')}</span></td>
+        <td>${obs}</td>
+      </tr>`;
+    }).join('');
+    if (norm.length > 100)
+      tbody.innerHTML += `<tr><td colspan="5" class="no-data">Mostrando 100 de ${norm.length} filas — descargue la planilla completa arriba.</td></tr>`;
+  } else {
+    tbody.innerHTML = `<tr><td colspan="5" class="no-data">${data.xlsx_base64 ? 'Planilla generada — descárguela arriba.' : 'Sin filas para mostrar'}</td></tr>`;
+  }
+
+  document.getElementById('tblWrap').style.display = 'block';
+  updateWizFooter();
+}
+
+/* ─── DOWNLOAD ─── */
+function download() {
+  if (!xlsxB64store) { alert('No hay archivo'); return; }
+  const bin = atob(xlsxB64store);
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = xlsxFilename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
