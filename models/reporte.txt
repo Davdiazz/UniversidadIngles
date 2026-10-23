@@ -1,0 +1,71 @@
+Dataset: 6000 estudiantes simulados (80% entrenamiento / 20% prueba)
+
+Exactitud en el set de prueba:
+  Regresión logística (modelo usado): 0.717
+  Árbol de decisión (profundidad 4):  0.654
+  Regla simple contando aciertos:     0.698
+
+              precision    recall  f1-score   support
+
+principiante       0.70      0.83      0.76       206
+      basico       0.53      0.54      0.53       210
+  intermedio       0.71      0.66      0.69       395
+    avanzado       0.84      0.81      0.82       389
+
+    accuracy                           0.72      1200
+   macro avg       0.70      0.71      0.70      1200
+weighted avg       0.72      0.72      0.72      1200
+
+Matriz de confusión (filas = real, columnas = predicho) ['principiante', 'basico', 'intermedio', 'avanzado']
+[[172  33   1   0]
+ [ 68 113  29   0]
+ [  5  68 261  61]
+ [  0   0  75 314]]
+
+Reglas del árbol de decisión (para explicar el modelo):
+|--- pct_no_la_conozco <= 0.15
+|   |--- acierto_B2 <= 0.75
+|   |   |--- acierto_B1 <= 0.75
+|   |   |   |--- acierto_A2 <= 0.75
+|   |   |   |   |--- class: principiante
+|   |   |   |--- acierto_A2 >  0.75
+|   |   |   |   |--- class: intermedio
+|   |   |--- acierto_B1 >  0.75
+|   |   |   |--- acierto_C2 <= 0.50
+|   |   |   |   |--- class: intermedio
+|   |   |   |--- acierto_C2 >  0.50
+|   |   |   |   |--- class: avanzado
+|   |--- acierto_B2 >  0.75
+|   |   |--- acierto_C1 <= 0.50
+|   |   |   |--- acierto_C2 <= 0.50
+|   |   |   |   |--- class: intermedio
+|   |   |   |--- acierto_C2 >  0.50
+|   |   |   |   |--- class: avanzado
+|   |   |--- acierto_C1 >  0.50
+|   |   |   |--- acierto_C2 <= 0.50
+|   |   |   |   |--- class: avanzado
+|   |   |   |--- acierto_C2 >  0.50
+|   |   |   |   |--- class: avanzado
+|--- pct_no_la_conozco >  0.15
+|   |--- acierto_A2 <= 0.75
+|   |   |--- acierto_A1 <= 0.75
+|   |   |   |--- acierto_B1 <= 0.75
+|   |   |   |   |--- class: principiante
+|   |   |   |--- acierto_B1 >  0.75
+|   |   |   |   |--- class: basico
+|   |   |--- acierto_A1 >  0.75
+|   |   |   |--- acierto_A2 <= 0.25
+|   |   |   |   |--- class: principiante
+|   |   |   |--- acierto_A2 >  0.25
+|   |   |   |   |--- class: basico
+|   |--- acierto_A2 >  0.75
+|   |   |--- acierto_B1 <= 0.75
+|   |   |   |--- acierto_B1 <= 0.25
+|   |   |   |   |--- class: basico
+|   |   |   |--- acierto_B1 >  0.25
+|   |   |   |   |--- class: basico
+|   |   |--- acierto_B1 >  0.75
+|   |   |   |--- acierto_B2 <= 0.25
+|   |   |   |   |--- class: intermedio
+|   |   |   |--- acierto_B2 >  0.25
+|   |   |   |   |--- class: intermedio

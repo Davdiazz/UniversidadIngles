@@ -1,0 +1,181 @@
+{
+  "name": "Tutor inglés - Conversación",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tutor-ingles",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "https://davdiazz.github.io"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5d66bf4e-20fb-48f4-a2d8-97d246c94cd5",
+      "name": "Webhook1",
+      "webhookId": "e643af49-db7e-43c1-b63c-74145d78b074"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\n// Niveles válidos que el frontend puede enviar en body.level\nconst NIVELES_VALIDOS = ['principiante', 'basico', 'intermedio', 'avanzado'];\n\nreturn inputData.map(item => {\n  const body = item.json.body || item.json;\n  const userMessage = body.message || \"\";\n  const history = body.conversationHistory || [];\n\n  // Perfil que devolvió el test de nivel (opcional). Si el estudiante no hizo el test, viene vacío.\n  const perfil = body.perfil || {};\n\n  // Nivel: el del test tiene prioridad; si no hay, el que eligió el usuario; si no, 'principiante'.\n  let nivel = (perfil.nivel || body.level || '').toLowerCase().trim();\n  if (!NIVELES_VALIDOS.includes(nivel)) {\n    nivel = 'principiante';\n  }\n\n  const messages = [];\n\n  const recentHistory = history.slice(-10).filter(msg => {\n    return msg.content &&\n           !msg.content.includes('={{ $json') &&\n           !msg.content.includes('={{') &&\n           msg.content.trim().length > 0;\n  });\n\n  recentHistory.forEach(msg => {\n    messages.push({\n      role: msg.role === 'user' ? 'user' : 'assistant',\n      content: msg.content\n    });\n  });\n\n  messages.push({\n    role: 'user',\n    content: userMessage\n  });\n\n  return {\n    json: {\n      messages: messages,\n      nivel: nivel,\n      cefr: perfil.cefr || null,\n      temasARepasar: (perfil.temasARepasar || []).slice(0, 5),\n      errores: (perfil.errores || []).slice(0, 6),\n      esPrimerMensaje: recentHistory.length === 0\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b6f467c0-64a1-497a-a734-019a82ac27b3",
+      "name": "Preparar mensajes y nivel"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.first().json;\nconst messages = inputData.messages || [];\nconst nivel = inputData.nivel;\nconst esPrimerMensaje = inputData.esPrimerMensaje;\nconst cefr = inputData.cefr;\nconst temasARepasar = inputData.temasARepasar || [];\nconst errores = inputData.errores || [];\n\nconst now = new Date();\nconst fecha = now.toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });\n\n// Instrucciones específicas por nivel: cuánto inglés meter, qué tan\n// simple debe ser el vocabulario, y qué tanto se explica en español.\nconst PERFILES_NIVEL = {\n  principiante: `NIVEL: PRINCIPIANTE (A1)\n- Habla principalmente en ESPAÑOL. Introduce inglés en frases muy cortas y simples (2-5 palabras), siempre traducidas de inmediato.\n- Vocabulario: solo palabras y frases del día a día (saludos, números, colores, familia, comida).\n- Corrige errores con mucha suavidad y siempre en español, mostrando la forma correcta.\n- Repite palabras clave en inglés varias veces a lo largo de la conversación para reforzar.\n- Nunca uses tiempos verbales complejos ni vocabulario abstracto.`,\n  basico: `NIVEL: BÁSICO (A2)\n- Mezcla español e inglés en proporción aprox. 60% español / 40% inglés.\n- Usa frases completas simples en inglés (presente simple, presente continuo), siempre con la traducción al lado la primera vez que aparecen.\n- Introduce vocabulario de temas cotidianos: rutinas, trabajo, viajes básicos, compras.\n- Corrige errores explicando brevemente la regla en español.`,\n  intermedio: `NIVEL: INTERMEDIO (B1-B2)\n- Mezcla equilibrada 50% español / 50% inglés. Puedes sostener partes completas de la conversación en inglés.\n- Usa tiempos verbales variados (pasado, futuro, condicional simple) y vocabulario de temas generales, trabajo, opiniones.\n- Corrige errores en inglés cuando sea posible, y aclara en español solo si el punto gramatical es complejo.\n- Anima al usuario a construir oraciones más largas y a dar su opinión en inglés.`,\n  avanzado: `NIVEL: AVANZADO (C1-C2)\n- Habla PRINCIPALMENTE en inglés (80-90%). Usa español solo para aclarar matices muy específicos o si el usuario se traba mucho.\n- Vocabulario amplio: modismos, phrasal verbs, registro formal e informal, temas abstractos.\n- Corrige errores sutiles de manera directa en inglés (naturalidad, tono, matices), no solo gramática básica.\n- Empuja al usuario a debatir, argumentar y usar estructuras más sofisticadas.`\n};\n\n// Sección nueva: lo que detectó el test de nivel (modelo entrenado con dataset + análisis de Groq)\nlet seccionDiagnostico = '';\nif (temasARepasar.length > 0 || errores.length > 0) {\n  const listaErrores = errores\n    .map(e => `- \"${e.original}\" → \"${e.correccion}\" (${e.tema})`)\n    .join('\\n');\n  seccionDiagnostico = `\n═══════════════════════════════\nDIAGNÓSTICO DEL TEST DE NIVEL\n═══════════════════════════════\nNivel CEFR estimado: ${cefr || nivel}\nTemas que este estudiante necesita repasar (del más urgente al menos urgente):\n${temasARepasar.map((t, i) => `${i + 1}. ${t}`).join('\\n')}\n${listaErrores ? `Errores que cometió en el test:\\n${listaErrores}` : ''}\n\nCómo usar este diagnóstico:\n- Guía la conversación para que el estudiante tenga que USAR estos temas (por ejemplo, si debe repasar el pasado simple, pregúntale qué hizo ayer).\n- Trabaja un tema a la vez, empezando por el primero. Cuando lo use bien 2-3 veces, felicítalo y pasa al siguiente.\n- Si repite uno de los errores del test, corrígelo y recuérdale brevemente la regla.\n- Cada 4-5 mensajes puedes proponer un mini-ejercicio de 1 línea sobre el tema actual.\n`;\n}\n\nconst systemPrompt = `Eres un tutor de inglés conversacional, cálido y paciente, que enseña mezclando español e inglés según el nivel del estudiante. Tu objetivo es que la persona practique inglés real en una conversación natural, no en ejercicios mecánicos.\n\nFECHA: ${fecha}\n\n${PERFILES_NIVEL[nivel]}\n${seccionDiagnostico}\n═══════════════════════════════\nCÓMO ENSEÑAS\n═══════════════════════════════\n- Mantén una conversación real y fluida sobre temas cotidianos o de interés del estudiante — no repitas listas de vocabulario sin contexto.\n- Cuando el estudiante cometa un error, no lo interrumpas de forma brusca: primero responde su idea, luego corrige con delicadeza mostrando la forma correcta.\n- Cuando introduzcas una palabra o expresión nueva en inglés, dala junto a su traducción entre paréntesis la primera vez, así: \"Let's go! (¡Vamos!)\".\n- Haz preguntas de seguimiento para que el estudiante siga hablando/escribiendo, no des respuestas que cierren la conversación.\n- Si el estudiante pide explícitamente subir o bajar de nivel, ajústate de inmediato al nuevo nivel indicado.\n- Sé alentador: reconoce el esfuerzo antes de corregir, nunca hagas sentir mal al estudiante por un error.\n\n═══════════════════════════════\nPRIMER MENSAJE DE LA CONVERSACIÓN\n═══════════════════════════════\n${esPrimerMensaje\n  ? (temasARepasar.length > 0\n      ? 'Este es el primer mensaje del estudiante. Salúdalo cálidamente, cuéntale en una frase su nivel según el test y el primer tema que van a practicar, y arranca con una pregunta que lo obligue a usar ese tema.'\n      : 'Este es el primer mensaje del estudiante. Salúdalo cálidamente, confirma el nivel con el que van a trabajar, y propón un tema sencillo de conversación para arrancar.')\n  : 'Ya llevan conversación previa — continúa el hilo de forma natural, no vuelvas a presentarte ni a repetir el saludo inicial.'}\n\n═══════════════════════════════\nREGLAS GENERALES\n═══════════════════════════════\n- Máximo 4-6 líneas por respuesta — es una conversación, no una clase magistral.\n- Nunca respondas solo en un idioma si el nivel pide mezcla; respeta la proporción español/inglés indicada arriba.\n- Si el estudiante escribe en inglés con errores, no te limites a corregir — sigue la conversación y dale una razón para seguir practicando.`;\n\nconst allMessages = [\n  { role: 'system', content: systemPrompt },\n  ...messages\n];\n\nreturn [{\n  json: {\n    model: \"openai/gpt-oss-120b\",\n    messages: allMessages,\n    temperature: 0.8,\n    max_tokens: 500,\n    reasoning_effort: \"low\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "705e0ca4-14fc-4658-b609-689f60a4b055",
+      "name": "Armar prompt tutor"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "8a82b13a-7ba8-4110-8909-5285805be1a4",
+      "name": "Llamar a Groq",
+      "credentials": {
+        "groqApi": {
+          "id": "MIar86booTIHpgaI",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const groqResponse = $input.first().json;\nconst nivel = $('Preparar mensajes y nivel').first().json.nivel;\n\nif (!groqResponse || !groqResponse.choices || groqResponse.choices.length === 0) {\n  return [{\n    json: {\n      response: \"Lo siento, hubo un error al procesar tu mensaje. Por favor intenta de nuevo.\",\n      nivel: nivel\n    }\n  }];\n}\n\nconst aiMessage = groqResponse.choices[0].message.content;\n\nreturn [{\n  json: {\n    response: aiMessage,\n    nivel: nivel\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "dea76e1a-cc6e-42ae-a233-b75ca31d88cf",
+      "name": "Parsear respuesta"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "3e48b3da-46a4-4598-92c1-d7b94c045651",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Preparar mensajes y nivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar mensajes y nivel": {
+      "main": [
+        [
+          {
+            "node": "Armar prompt tutor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar prompt tutor": {
+      "main": [
+        [
+          {
+            "node": "Llamar a Groq",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Llamar a Groq": {
+      "main": [
+        [
+          {
+            "node": "Parsear respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear respuesta": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

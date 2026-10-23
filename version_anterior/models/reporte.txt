@@ -1,0 +1,21 @@
+Exactitud CEFR exacta (6 niveles): 0.620
+Exactitud CEFR +-1 nivel:          0.913
+Exactitud en los 4 niveles de la app: 0.758
+
+Reporte por nivel de la app:
+              precision    recall  f1-score   support
+
+principiante       0.44      0.11      0.17        37
+      basico       0.68      0.84      0.75       488
+  intermedio       0.84      0.76      0.80       814
+    avanzado       0.69      0.64      0.66       121
+
+    accuracy                           0.76      1460
+   macro avg       0.66      0.58      0.60      1460
+weighted avg       0.76      0.76      0.75      1460
+
+Matriz de confusión (filas = real, columnas = predicho) ['principiante', 'basico', 'intermedio', 'avanzado']
+[[  4  32   1   0]
+ [  5 408  74   1]
+ [  0 162 618  34]
+ [  0   0  44  77]]

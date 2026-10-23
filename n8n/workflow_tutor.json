@@ -1,0 +1,198 @@
+{
+  "name": "Tutor inglés - Conversación + modelo ML",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tutor-ingles",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7f18568d-98f0-4a47-ba50-f6ac3fb05ae5",
+      "name": "Webhook1",
+      "webhookId": "753a56a9-6777-454f-b239-454b5fb44ca7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const BANCO = [{\"palabra\": \"bed\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"cama\"},{\"palabra\": \"chair\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"silla\"},{\"palabra\": \"shirt\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"camisa\"},{\"palabra\": \"woman\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"mujer\"},{\"palabra\": \"hill\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"colina\"},{\"palabra\": \"trousers\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"pantalones\"},{\"palabra\": \"wait\",\"pos\": \"verb\",\"cefr\": \"A1\",\"traduccion\": \"esperar\"},{\"palabra\": \"finish\",\"pos\": \"verb\",\"cefr\": \"A1\",\"traduccion\": \"terminar\"},{\"palabra\": \"heavy\",\"pos\": \"adjective\",\"cefr\": \"A1\",\"traduccion\": \"pesado\"},{\"palabra\": \"thin\",\"pos\": \"adjective\",\"cefr\": \"A1\",\"traduccion\": \"delgado\"},{\"palabra\": \"clever\",\"pos\": \"adjective\",\"cefr\": \"A1\",\"traduccion\": \"inteligente\"},{\"palabra\": \"sunny\",\"pos\": \"adjective\",\"cefr\": \"A1\",\"traduccion\": \"soleado\"},{\"palabra\": \"spoon\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"cuchara\"},{\"palabra\": \"envelope\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"sobre (de carta)\"},{\"palabra\": \"weight\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"peso\"},{\"palabra\": \"silver\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"plata\"},{\"palabra\": \"beginning\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"comienzo\"},{\"palabra\": \"drawing\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"dibujo\"},{\"palabra\": \"shut\",\"pos\": \"verb\",\"cefr\": \"A2\",\"traduccion\": \"cerrar\"},{\"palabra\": \"hug\",\"pos\": \"verb\",\"cefr\": \"A2\",\"traduccion\": \"abrazar\"},{\"palabra\": \"worried\",\"pos\": \"adjective\",\"cefr\": \"A2\",\"traduccion\": \"preocupado\"},{\"palabra\": \"loose\",\"pos\": \"adjective\",\"cefr\": \"A2\",\"traduccion\": \"suelto\"},{\"palabra\": \"worse\",\"pos\": \"adjective\",\"cefr\": \"A2\",\"traduccion\": \"peor\"},{\"palabra\": \"sleepless\",\"pos\": \"adjective\",\"cefr\": \"A2\",\"traduccion\": \"sin dormir\"},{\"palabra\": \"praise\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"elogio\"},{\"palabra\": \"guilt\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"culpa\"},{\"palabra\": \"army\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"ejército\"},{\"palabra\": \"blessing\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"bendición\"},{\"palabra\": \"calf\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"ternero\"},{\"palabra\": \"tracksuit\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"sudadera deportiva\"},{\"palabra\": \"pillow\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"almohada\"},{\"palabra\": \"jealous\",\"pos\": \"adjective\",\"cefr\": \"B1\",\"traduccion\": \"celoso\"},{\"palabra\": \"aid\",\"pos\": \"verb\",\"cefr\": \"B1\",\"traduccion\": \"ayudar\"},{\"palabra\": \"breathless\",\"pos\": \"adjective\",\"cefr\": \"B1\",\"traduccion\": \"sin aliento\"},{\"palabra\": \"newborn\",\"pos\": \"adjective\",\"cefr\": \"B1\",\"traduccion\": \"recién nacido\"},{\"palabra\": \"flat\",\"pos\": \"adjective\",\"cefr\": \"B1\",\"traduccion\": \"plano\"},{\"palabra\": \"thirst\",\"pos\": \"noun\",\"cefr\": \"B2\",\"traduccion\": \"sed\"},{\"palabra\": \"throat\",\"pos\": \"noun\",\"cefr\": \"B2\",\"traduccion\": \"garganta\"},{\"palabra\": \"hood\",\"pos\": \"noun\",\"cefr\": \"B2\",\"traduccion\": \"capucha\"},{\"palabra\": \"craftsman\",\"pos\": \"noun\",\"cefr\": \"B2\",\"traduccion\": \"artesano\"},{\"palabra\": \"tickle\",\"pos\": \"verb\",\"cefr\": \"B2\",\"traduccion\": \"hacer cosquillas\"},{\"palabra\": \"rub\",\"pos\": \"verb\",\"cefr\": \"B2\",\"traduccion\": \"frotar\"},{\"palabra\": \"unload\",\"pos\": \"verb\",\"cefr\": \"B2\",\"traduccion\": \"descargar\"},{\"palabra\": \"dreadful\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"espantoso\"},{\"palabra\": \"bossy\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"mandón\"},{\"palabra\": \"bustling\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"bullicioso\"},{\"palabra\": \"truthful\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"sincero\"},{\"palabra\": \"unreliable\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"poco confiable\"},{\"palabra\": \"inheritance\",\"pos\": \"noun\",\"cefr\": \"C1\",\"traduccion\": \"herencia\"},{\"palabra\": \"honk\",\"pos\": \"noun\",\"cefr\": \"C1\",\"traduccion\": \"bocinazo\"},{\"palabra\": \"suds\",\"pos\": \"noun\",\"cefr\": \"C1\",\"traduccion\": \"espuma de jabón\"},{\"palabra\": \"slob\",\"pos\": \"noun\",\"cefr\": \"C1\",\"traduccion\": \"persona desaliñada\"},{\"palabra\": \"gnaw\",\"pos\": \"verb\",\"cefr\": \"C1\",\"traduccion\": \"roer\"},{\"palabra\": \"aimless\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"sin rumbo\"},{\"palabra\": \"scathing\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"mordaz\"},{\"palabra\": \"engrossing\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"absorbente\"},{\"palabra\": \"vicious\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"despiadado\"},{\"palabra\": \"unsettling\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"perturbador\"},{\"palabra\": \"effortless\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"sin esfuerzo\"},{\"palabra\": \"unwavering\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"inquebrantable\"},{\"palabra\": \"bauble\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"baratija\"},{\"palabra\": \"hull\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"casco (de un barco)\"},{\"palabra\": \"vermin\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"alimañas\"},{\"palabra\": \"gale\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"vendaval\"},{\"palabra\": \"shoal\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"banco de peces\"},{\"palabra\": \"quiver\",\"pos\": \"verb\",\"cefr\": \"C2\",\"traduccion\": \"temblar\"},{\"palabra\": \"mangle\",\"pos\": \"verb\",\"cefr\": \"C2\",\"traduccion\": \"destrozar\"},{\"palabra\": \"brim\",\"pos\": \"verb\",\"cefr\": \"C2\",\"traduccion\": \"rebosar\"},{\"palabra\": \"elated\",\"pos\": \"adjective\",\"cefr\": \"C2\",\"traduccion\": \"eufórico\"},{\"palabra\": \"tetchy\",\"pos\": \"adjective\",\"cefr\": \"C2\",\"traduccion\": \"irritable\"},{\"palabra\": \"hapless\",\"pos\": \"adjective\",\"cefr\": \"C2\",\"traduccion\": \"desdichado\"},{\"palabra\": \"daunting\",\"pos\": \"adjective\",\"cefr\": \"C2\",\"traduccion\": \"intimidante\"}];\nconst MODELO = {\"tipo\": \"regresion_logistica_multinomial\", \"features\": [\"acierto_A1\", \"acierto_A2\", \"acierto_B1\", \"acierto_B2\", \"acierto_C1\", \"acierto_C2\", \"pct_no_la_conozco\"], \"clases\": [\"avanzado\", \"basico\", \"intermedio\", \"principiante\"], \"coeficientes\": [[1.56117, 2.0025, 3.55768, 3.61573, 1.41766, 1.0516, -2.49446], [-0.2735, -0.79408, -1.60619, -1.81675, -0.79159, -0.28953, 0.71181], [1.0031, 1.71244, 1.31046, 0.53843, -0.13203, -0.32503, 0.06291], [-2.29077, -2.92086, -3.26195, -2.33741, -0.49403, -0.43704, 1.71975]], \"interceptos\": [-8.3471, 3.74384, -2.09648, 6.69974], \"preguntas_por_nivel\": {\"A1\": 2, \"A2\": 2, \"B1\": 2, \"B2\": 2, \"C1\": 1, \"C2\": 1}, \"exactitud_prueba\": 0.717};\n\n// La página envía junto a cada mensaje: { encuesta: { respuestas: { \"spoon\": \"cuchara\", \"gale\": \"No la conozco\", ... } } }\nconst body = $input.first().json.body || $input.first().json;\nconst respuestas = (body.encuesta && body.encuesta.respuestas) || {};\nconst NIVELES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];\n\n// Si el usuario no hizo la encuesta, seguimos sin predicción (se usa body.level o 'principiante')\nif (Object.keys(respuestas).length === 0) {\n  return [{ json: { body, prediccion: null } }];\n}\n\nconst porPalabra = Object.fromEntries(BANCO.map(p => [p.palabra, p]));\nconst aciertos = Object.fromEntries(NIVELES.map(n => [n, 0]));\nlet noLaConozco = 0;\nlet totalAciertos = 0;\nconst palabrasDesconocidas = [];\n\nfor (const [palabra, respuesta] of Object.entries(respuestas)) {\n  const p = porPalabra[palabra];\n  if (!p) continue;\n  if (respuesta === p.traduccion) {\n    aciertos[p.cefr] += 1;\n    totalAciertos += 1;\n  } else {\n    if (!respuesta || respuesta === 'No la conozco') noLaConozco += 1;\n    palabrasDesconocidas.push({ palabra: p.palabra, traduccion: p.traduccion, cefr: p.cefr });\n  }\n}\n\n// Mismas variables (features) con las que se entrenó el modelo en train_model.py\nconst totalPreguntas = Object.values(MODELO.preguntas_por_nivel).reduce((a, b) => a + b, 0);\nconst x = [\n  ...NIVELES.map(n => aciertos[n] / MODELO.preguntas_por_nivel[n]),\n  noLaConozco / totalPreguntas\n];\n\n// Regresión logística multinomial: puntaje por clase -> softmax -> probabilidades\nconst puntajes = MODELO.coeficientes.map((w, k) =>\n  w.reduce((suma, wi, i) => suma + wi * x[i], MODELO.interceptos[k]));\nconst maximo = Math.max(...puntajes);\nconst exps = puntajes.map(s => Math.exp(s - maximo));\nconst sumaExps = exps.reduce((a, b) => a + b, 0);\nconst probabilidades = {};\nMODELO.clases.forEach((clase, k) => { probabilidades[clase] = Math.round((exps[k] / sumaExps) * 1000) / 1000; });\n\nconst nivel = Object.entries(probabilidades).sort((a, b) => b[1] - a[1])[0][0];\n\nreturn [{\n  json: {\n    body,\n    prediccion: {\n      nivel,\n      probabilidades,\n      aciertos: `${totalAciertos}/${totalPreguntas}`,\n      palabrasDesconocidas\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d340bed0-ea4d-4d6e-a8d3-a9f5a72a6e79",
+      "name": "Predecir nivel (modelo ML)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\n// Niveles válidos que el frontend puede enviar en body.level\nconst NIVELES_VALIDOS = ['principiante', 'basico', 'intermedio', 'avanzado'];\n\nreturn inputData.map(item => {\n  const body = item.json.body || item.json;\n  const prediccion = item.json.prediccion;  // viene del nodo \"Predecir nivel (modelo ML)\"\n  const userMessage = body.message || \"\";\n  const history = body.conversationHistory || [];\n\n  // Nivel: el que predijo el modelo ML con la encuesta. Si no hay encuesta, el que mande la página\n  // en body.level, y si tampoco, 'principiante' para no asumir un nivel que no tiene.\n  let nivel = ((prediccion && prediccion.nivel) || body.level || '').toLowerCase().trim();\n  if (!NIVELES_VALIDOS.includes(nivel)) {\n    nivel = 'principiante';\n  }\n\n  // Palabras que el estudiante no supo en la encuesta\n  const palabrasDesconocidas = ((prediccion && prediccion.palabrasDesconocidas) || []).slice(0, 10);\n\n  const messages = [];\n\n  const recentHistory = history.slice(-10).filter(msg => {\n    return msg.content &&\n           !msg.content.includes('={{ $json') &&\n           !msg.content.includes('={{') &&\n           msg.content.trim().length > 0;\n  });\n\n  recentHistory.forEach(msg => {\n    messages.push({\n      role: msg.role === 'user' ? 'user' : 'assistant',\n      content: msg.content\n    });\n  });\n\n  messages.push({\n    role: 'user',\n    content: userMessage\n  });\n\n  return {\n    json: {\n      messages: messages,\n      nivel: nivel,\n      aciertosEncuesta: prediccion ? prediccion.aciertos : null,\n      palabrasDesconocidas: palabrasDesconocidas,\n      esPrimerMensaje: recentHistory.length === 0\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "77a2be21-9684-4388-9b92-51619ef7f42e",
+      "name": "Preparar mensajes y nivel"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.first().json;\nconst messages = inputData.messages || [];\nconst nivel = inputData.nivel;\nconst esPrimerMensaje = inputData.esPrimerMensaje;\nconst palabrasDesconocidas = inputData.palabrasDesconocidas || [];\nconst aciertosEncuesta = inputData.aciertosEncuesta;\n\nconst now = new Date();\nconst fecha = now.toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });\n\n// Instrucciones específicas por nivel: cuánto inglés meter, qué tan\n// simple debe ser el vocabulario, y qué tanto se explica en español.\nconst PERFILES_NIVEL = {\n  principiante: `NIVEL: PRINCIPIANTE (A1)\n- Habla principalmente en ESPAÑOL. Introduce inglés en frases muy cortas y simples (2-5 palabras), siempre traducidas de inmediato.\n- Vocabulario: solo palabras y frases del día a día (saludos, números, colores, familia, comida).\n- Corrige errores con mucha suavidad y siempre en español, mostrando la forma correcta.\n- Repite palabras clave en inglés varias veces a lo largo de la conversación para reforzar.\n- Nunca uses tiempos verbales complejos ni vocabulario abstracto.`,\n  basico: `NIVEL: BÁSICO (A2)\n- Mezcla español e inglés en proporción aprox. 60% español / 40% inglés.\n- Usa frases completas simples en inglés (presente simple, presente continuo), siempre con la traducción al lado la primera vez que aparecen.\n- Introduce vocabulario de temas cotidianos: rutinas, trabajo, viajes básicos, compras.\n- Corrige errores explicando brevemente la regla en español.`,\n  intermedio: `NIVEL: INTERMEDIO (B1-B2)\n- Mezcla equilibrada 50% español / 50% inglés. Puedes sostener partes completas de la conversación en inglés.\n- Usa tiempos verbales variados (pasado, futuro, condicional simple) y vocabulario de temas generales, trabajo, opiniones.\n- Corrige errores en inglés cuando sea posible, y aclara en español solo si el punto gramatical es complejo.\n- Anima al usuario a construir oraciones más largas y a dar su opinión en inglés.`,\n  avanzado: `NIVEL: AVANZADO (C1-C2)\n- Habla PRINCIPALMENTE en inglés (80-90%). Usa español solo para aclarar matices muy específicos o si el usuario se traba mucho.\n- Vocabulario amplio: modismos, phrasal verbs, registro formal e informal, temas abstractos.\n- Corrige errores sutiles de manera directa en inglés (naturalidad, tono, matices), no solo gramática básica.\n- Empuja al usuario a debatir, argumentar y usar estructuras más sofisticadas.`\n};\n\n// Palabras que el estudiante no supo en la encuesta: el tutor las va metiendo en la conversación\nlet seccionVocabulario = '';\nif (palabrasDesconocidas.length > 0) {\n  seccionVocabulario = `\n═══════════════════════════════\nVOCABULARIO A REFORZAR (de la encuesta)\n═══════════════════════════════\nEl estudiante NO conocía estas palabras: ${palabrasDesconocidas.map(p => `${p.palabra} (${p.traduccion}, ${p.cefr})`).join(', ')}.\n- Empieza por las de nivel más bajo y usa máximo 1-2 por respuesta, de forma natural dentro de la conversación, con su traducción entre paréntesis.\n- Más adelante, haz preguntas que lo animen a usarlas él mismo.\n`;\n}\n\nconst systemPrompt = `Eres un tutor de inglés conversacional, cálido y paciente, que enseña mezclando español e inglés según el nivel del estudiante. Tu objetivo es que la persona practique inglés real en una conversación natural, no en ejercicios mecánicos.\n\nFECHA: ${fecha}\n\n${aciertosEncuesta ? `El nivel del estudiante lo predijo un modelo de machine learning a partir de una encuesta de vocabulario (acertó ${aciertosEncuesta} palabras). Si durante la conversación notas claramente que su nivel real es más alto o más bajo, ajústate poco a poco.` : ''}\n\n${PERFILES_NIVEL[nivel]}\n${seccionVocabulario}\n═══════════════════════════════\nCÓMO ENSEÑAS\n═══════════════════════════════\n- Mantén una conversación real y fluida sobre temas cotidianos o de interés del estudiante — no repitas listas de vocabulario sin contexto.\n- Cuando el estudiante cometa un error, no lo interrumpas de forma brusca: primero responde su idea, luego corrige con delicadeza mostrando la forma correcta.\n- Cuando introduzcas una palabra o expresión nueva en inglés, dala junto a su traducción entre paréntesis la primera vez, así: \"Let's go! (¡Vamos!)\".\n- Haz preguntas de seguimiento para que el estudiante siga hablando/escribiendo, no des respuestas que cierren la conversación.\n- Si el estudiante pide explícitamente subir o bajar de nivel, ajústate de inmediato al nuevo nivel indicado.\n- Sé alentador: reconoce el esfuerzo antes de corregir, nunca hagas sentir mal al estudiante por un error.\n\n═══════════════════════════════\nPRIMER MENSAJE DE LA CONVERSACIÓN\n═══════════════════════════════\n${esPrimerMensaje ? 'Este es el primer mensaje del estudiante. Salúdalo cálidamente, cuéntale en una frase el nivel que salió en su encuesta, y propón un tema sencillo de conversación para arrancar.' : 'Ya llevan conversación previa — continúa el hilo de forma natural, no vuelvas a presentarte ni a repetir el saludo inicial.'}\n\n═══════════════════════════════\nREGLAS GENERALES\n═══════════════════════════════\n- Máximo 4-6 líneas por respuesta — es una conversación, no una clase magistral.\n- Nunca respondas solo en un idioma si el nivel pide mezcla; respeta la proporción español/inglés indicada arriba.\n- Si el estudiante escribe en inglés con errores, no te limites a corregir — sigue la conversación y dale una razón para seguir practicando.`;\n\nconst allMessages = [\n  { role: 'system', content: systemPrompt },\n  ...messages\n];\n\nreturn [{\n  json: {\n    model: \"openai/gpt-oss-120b\",\n    messages: allMessages,\n    temperature: 0.8,\n    max_tokens: 500,\n    reasoning_effort: \"low\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "afbb07db-e05d-4688-ace4-dfb3712a19e7",
+      "name": "Armar prompt tutor"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        896,
+        0
+      ],
+      "id": "c70a686c-89b5-4891-9ead-141af760e905",
+      "name": "Llamar a Groq",
+      "credentials": {
+        "groqApi": {
+          "id": "MIar86booTIHpgaI",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const groqResponse = $input.first().json;\nconst nivel = $('Preparar mensajes y nivel').first().json.nivel;\n// Resultado del modelo ML: la página lo usa para mostrar el nivel y las probabilidades\nconst prediccion = $('Predecir nivel (modelo ML)').first().json.prediccion;\n\nif (!groqResponse || !groqResponse.choices || groqResponse.choices.length === 0) {\n  return [{\n    json: {\n      response: \"Lo siento, hubo un error al procesar tu mensaje. Por favor intenta de nuevo.\",\n      nivel: nivel,\n      prediccion: prediccion\n    }\n  }];\n}\n\nconst aiMessage = groqResponse.choices[0].message.content;\n\nreturn [{\n  json: {\n    response: aiMessage,\n    nivel: nivel,\n    prediccion: prediccion\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "c4cc4f28-c318-4e92-b1c1-a44cb201d1b7",
+      "name": "Parsear respuesta"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "4cd4b9cc-85dd-4740-b148-436d16ee9a89",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Predecir nivel (modelo ML)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predecir nivel (modelo ML)": {
+      "main": [
+        [
+          {
+            "node": "Preparar mensajes y nivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar mensajes y nivel": {
+      "main": [
+        [
+          {
+            "node": "Armar prompt tutor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar prompt tutor": {
+      "main": [
+        [
+          {
+            "node": "Llamar a Groq",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Llamar a Groq": {
+      "main": [
+        [
+          {
+            "node": "Parsear respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear respuesta": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

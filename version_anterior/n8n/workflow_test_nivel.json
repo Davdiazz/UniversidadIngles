@@ -1,0 +1,264 @@
+{
+  "name": "Tutor inglés - Test de nivel",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "test-nivel",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "https://davdiazz.github.io"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -200
+      ],
+      "id": "213ac305-a594-4b9e-b94f-2e89ec5212e3",
+      "name": "Pedir preguntas",
+      "webhookId": "1f895a0f-bb23-4eb4-9206-7aa4141d5297"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:8001/placement-test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        -200
+      ],
+      "id": "65356cae-7f9e-4712-81b8-b18ba5234413",
+      "name": "Obtener preguntas"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        448,
+        -200
+      ],
+      "id": "4f563266-9a15-4fd3-9240-d32138126acf",
+      "name": "Responder preguntas"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nivel-ingles",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "https://davdiazz.github.io"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a6d5692e-f7cb-4293-8791-b0616dc6d5dc",
+      "name": "Recibir respuestas",
+      "webhookId": "c82cab6b-e4b2-4119-a6ba-e661c015cb0a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8001/evaluate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "ec200675-e4d5-481a-ae8f-7335323925f5",
+      "name": "Detectar nivel (modelo)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Resultado del modelo entrenado con el dataset (servicio Python /evaluate)\nconst modelo = $input.first().json;\nconst abiertas = modelo.respuestas_abiertas || {};\n\nconst respuestasTexto = Object.entries(abiertas)\n  .map(([id, texto]) => `- (${id}) ${texto || '(sin respuesta)'}`)\n  .join('\\n');\n\nconst falladas = (modelo.preguntas_falladas || [])\n  .map(f => `- [${f.nivel_cefr}] ${f.tema}: \"${f.pregunta}\" respondió \"${f.respuesta_dada}\" (correcto: \"${f.respuesta_correcta}\")`)\n  .join('\\n') || '- Ninguna';\n\nconst systemPrompt = `Eres un evaluador experto de inglés para hispanohablantes. Un modelo entrenado con un dataset CEFR ya estimó el nivel del estudiante. Tu trabajo es analizar sus errores concretos y armar un plan de repaso.\n\nNIVEL ESTIMADO POR EL MODELO: ${modelo.cefr_estimado} (${modelo.nivel})\nPREGUNTAS DE OPCIÓN MÚLTIPLE FALLADAS:\n${falladas}\nCONTENIDOS GRAMATICALES DEL SIGUIENTE NIVEL (CEFR-J): ${(modelo.siguientes_contenidos_cefrj || []).join('; ')}\n\nResponde SOLO con un JSON válido con esta forma exacta:\n{\n  \"errores\": [{\"original\": \"frase con error\", \"correccion\": \"frase corregida\", \"explicacion\": \"explicación breve en español\", \"tema\": \"tema gramatical en español\"}],\n  \"fortalezas\": [\"algo que hace bien, en español\"],\n  \"temas_a_repasar\": [\"máximo 4 temas en español, del más urgente al menos urgente\"],\n  \"plan_de_repaso\": [\"3 pasos concretos y cortos en español\"],\n  \"mensaje_para_estudiante\": \"2-3 frases cálidas en español explicando su nivel y qué vamos a trabajar\"\n}\nNo inventes errores: si las respuestas escritas no tienen errores, deja \"errores\" vacío.`;\n\nreturn [{\n  json: {\n    model: 'openai/gpt-oss-120b',\n    messages: [\n      { role: 'system', content: systemPrompt },\n      { role: 'user', content: `Respuestas escritas del estudiante:\\n${respuestasTexto}` }\n    ],\n    temperature: 0.2,\n    max_tokens: 1200,\n    reasoning_effort: 'low',\n    response_format: { type: 'json_object' }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "fea1b29c-0ce0-4dcb-902a-146feae1b354",
+      "name": "Armar prompt diagnóstico"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "81a9694b-9533-4648-b531-f1c4a9bb4cf8",
+      "name": "Groq analiza errores",
+      "credentials": {
+        "groqApi": {
+          "id": "MIar86booTIHpgaI",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const modelo = $('Detectar nivel (modelo)').first().json;\nconst groq = $input.first().json;\n\nlet analisis = {};\ntry {\n  analisis = JSON.parse(groq.choices[0].message.content);\n} catch (e) {\n  analisis = { errores: [], fortalezas: [], temas_a_repasar: [], plan_de_repaso: [],\n               mensaje_para_estudiante: 'Ya tenemos tu nivel. ¡Empecemos a practicar!' };\n}\n\n// Unimos los temas detectados por el test (dataset) con los que encontró Groq en la escritura\nconst temas = [...new Set([...(modelo.temas_a_repasar || []), ...(analisis.temas_a_repasar || [])])].slice(0, 5);\n\n// Este objeto \"perfil\" es el que el frontend debe guardar y reenviar en cada mensaje del tutor\nreturn [{\n  json: {\n    nivel: modelo.nivel,\n    cefr: modelo.cefr_estimado,\n    aciertos_test: modelo.detalle.aciertos_test,\n    temasARepasar: temas,\n    errores: (analisis.errores || []).slice(0, 6),\n    fortalezas: analisis.fortalezas || [],\n    planDeRepaso: analisis.plan_de_repaso || [],\n    mensaje: analisis.mensaje_para_estudiante || ''\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "6f41d707-b801-4d6f-80bb-bf24e8bca2b3",
+      "name": "Unir diagnóstico"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "97693e6c-cf64-4c8a-9664-0ccca8403e73",
+      "name": "Responder diagnóstico"
+    }
+  ],
+  "connections": {
+    "Pedir preguntas": {
+      "main": [
+        [
+          {
+            "node": "Obtener preguntas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener preguntas": {
+      "main": [
+        [
+          {
+            "node": "Responder preguntas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recibir respuestas": {
+      "main": [
+        [
+          {
+            "node": "Detectar nivel (modelo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detectar nivel (modelo)": {
+      "main": [
+        [
+          {
+            "node": "Armar prompt diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar prompt diagnóstico": {
+      "main": [
+        [
+          {
+            "node": "Groq analiza errores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq analiza errores": {
+      "main": [
+        [
+          {
+            "node": "Unir diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unir diagnóstico": {
+      "main": [
+        [
+          {
+            "node": "Responder diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "_comentario": "Test de ubicación. Cada pregunta está ligada a un punto gramatical del CEFR-J Grammar Profile (campo 'gramatica_cefrj') y a su nivel. Las respuestas abiertas se evalúan con el modelo entrenado + Groq.",
+  "opcion_multiple": [
+    {
+      "id": "q1", "nivel_cefr": "A1", "tema": "Verbo to be (am / is / are)",
+      "gramatica_cefrj": "he/she is",
+      "pregunta": "My sister ___ a teacher.",
+      "opciones": ["am", "is", "are", "be"], "correcta": "is"
+    },
+    {
+      "id": "q2", "nivel_cefr": "A1", "tema": "Presente simple (tercera persona: -s)",
+      "gramatica_cefrj": "TENSE/ASPECT: PRESENT (lexical verbs)",
+      "pregunta": "He ___ coffee every morning.",
+      "opciones": ["drink", "drinks", "drinking", "is drink"], "correcta": "drinks"
+    },
+    {
+      "id": "q3", "nivel_cefr": "A1", "tema": "Artículos (a / an / the)",
+      "gramatica_cefrj": "INDEFINITE ARTICLES",
+      "pregunta": "I have ___ apple in my bag.",
+      "opciones": ["a", "an", "the", "-"], "correcta": "an"
+    },
+    {
+      "id": "q4", "nivel_cefr": "A2", "tema": "Pasado simple",
+      "gramatica_cefrj": "TENSE/ASPECT: PAST (BE)",
+      "pregunta": "Yesterday we ___ to the cinema.",
+      "opciones": ["go", "goes", "went", "gone"], "correcta": "went"
+    },
+    {
+      "id": "q5", "nivel_cefr": "A2", "tema": "Comparativos (-er / more)",
+      "gramatica_cefrj": "COMPARATIVE OF SUPERIORITY: more+ADJ/ADV",
+      "pregunta": "This book is ___ than the movie.",
+      "opciones": ["interesting", "more interesting", "most interesting", "interestinger"], "correcta": "more interesting"
+    },
+    {
+      "id": "q6", "nivel_cefr": "A2", "tema": "Futuro con 'going to'",
+      "gramatica_cefrj": "MODAL/AUX: be going to",
+      "pregunta": "Look at those clouds! It ___ rain.",
+      "opciones": ["is going to", "going to", "will to", "goes to"], "correcta": "is going to"
+    },
+    {
+      "id": "q7", "nivel_cefr": "B1", "tema": "Presente perfecto",
+      "gramatica_cefrj": "TENSE/ASPECT: PRESENT PERFECT",
+      "pregunta": "I ___ in this city since 2019.",
+      "opciones": ["live", "am living", "have lived", "lived"], "correcta": "have lived"
+    },
+    {
+      "id": "q8", "nivel_cefr": "B1", "tema": "Pasado perfecto",
+      "gramatica_cefrj": "TENSE/ASPECT: PAST PERFECT",
+      "pregunta": "When we arrived, the train ___ already left.",
+      "opciones": ["has", "had", "was", "have"], "correcta": "had"
+    },
+    {
+      "id": "q9", "nivel_cefr": "B1", "tema": "Verbos modales (should / must)",
+      "gramatica_cefrj": "MODAL/AUX: should",
+      "pregunta": "You look tired. You ___ go to bed early.",
+      "opciones": ["should", "must to", "ought", "would to"], "correcta": "should"
+    },
+    {
+      "id": "q10", "nivel_cefr": "B2", "tema": "Voz pasiva",
+      "gramatica_cefrj": "PASSIVE: PRESENT PERFECT",
+      "pregunta": "The new bridge ___ by the city last year.",
+      "opciones": ["built", "was built", "has built", "is building"], "correcta": "was built"
+    },
+    {
+      "id": "q11", "nivel_cefr": "B2", "tema": "Condicionales (tercer condicional)",
+      "gramatica_cefrj": "AUX+PERFECT",
+      "pregunta": "If I had studied more, I ___ the exam.",
+      "opciones": ["would pass", "will pass", "would have passed", "passed"], "correcta": "would have passed"
+    },
+    {
+      "id": "q12", "nivel_cefr": "C1", "tema": "Inversión y estructuras avanzadas",
+      "gramatica_cefrj": "AUX+PERFECT",
+      "pregunta": "___ had I sat down than the phone rang.",
+      "opciones": ["No sooner", "As soon", "Hardly ever", "Just when"], "correcta": "No sooner"
+    }
+  ],
+  "abiertas": [
+    {
+      "id": "w1", "nivel_objetivo": "A1-A2",
+      "pregunta": "Describe yourself and your family in 2-3 sentences.",
+      "ayuda_es": "Descríbete a ti y a tu familia en 2 o 3 frases (en inglés)."
+    },
+    {
+      "id": "w2", "nivel_objetivo": "A2-B1",
+      "pregunta": "What did you do last weekend?",
+      "ayuda_es": "¿Qué hiciste el fin de semana pasado? (responde en inglés)"
+    },
+    {
+      "id": "w3", "nivel_objetivo": "B1-C1",
+      "pregunta": "If you could change one thing about your city, what would it be and why?",
+      "ayuda_es": "Si pudieras cambiar algo de tu ciudad, ¿qué sería y por qué? (en inglés)"
+    }
+  ]
+}
