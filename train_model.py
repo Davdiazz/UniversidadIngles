@@ -19,6 +19,7 @@ Genera:
 """
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 import joblib
@@ -138,6 +139,8 @@ def main():
         "interceptos": modelo.intercept_.round(5).tolist(),
         "preguntas_por_nivel": PREGUNTAS_POR_NIVEL,
         "exactitud_prueba": round(float(accuracy_score(y_test, pred)), 3),
+        "n_estudiantes": len(df),
+        "entrenado_el": datetime.now().isoformat(timespec="seconds"),
     }
     (MODELS_DIR / "modelo_nivel.json").write_text(json.dumps(pesos, indent=2))
     joblib.dump(modelo, MODELS_DIR / "modelo_nivel.joblib")

@@ -16,6 +16,7 @@ Endpoint:
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.concurrency import run_in_threadpool
 from faster_whisper import WhisperModel
 import tempfile
 import os
@@ -36,6 +37,16 @@ app.add_middleware(
 model = WhisperModel("small", device="cpu", compute_type="int8")
 
 
+def transcribir(ruta: str) -> dict:
+    segments, info = model.transcribe(ruta, language=None, vad_filter=True)
+    texto_completo = " ".join(segment.text.strip() for segment in segments)  # aquí se transcribe de verdad
+    return {
+        "text": texto_completo.strip(),
+        "language": info.language,
+        "language_probability": round(info.language_probability, 3)
+    }
+
+
 @app.post("/transcribe")
 async def transcribe(audio: UploadFile = File(...)):
     if not audio.filename:
@@ -52,15 +63,9 @@ async def transcribe(audio: UploadFile = File(...)):
         # language=None deja que Whisper detecte el idioma automáticamente por segmento.
         # Esto es clave para tu caso: si el estudiante mezcla español e inglés, cada
         # segmento se transcribe en su idioma real en vez de forzar uno solo.
-        segments, info = model.transcribe(tmp_path, language=None, vad_filter=True)
-
-        texto_completo = " ".join(segment.text.strip() for segment in segments)
-
-        return {
-            "text": texto_completo.strip(),
-            "language": info.language,
-            "language_probability": round(info.language_probability, 3)
-        }
+        # Whisper tarda unos segundos: se corre en otro hilo para que el servidor siga atendiendo
+        # a los demás estudiantes (chat, encuesta) mientras transcribe este audio.
+        return await run_in_threadpool(transcribir, tmp_path)
     finally:
         os.remove(tmp_path)
 
@@ -68,3 +73,8 @@ async def transcribe(audio: UploadFile = File(...)):
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

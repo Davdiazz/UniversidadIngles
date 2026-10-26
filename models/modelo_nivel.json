@@ -67,5 +67,7 @@
     "C1": 1,
     "C2": 1
   },
-  "exactitud_prueba": 0.717
+  "exactitud_prueba": 0.717,
+  "n_estudiantes": 6000,
+  "entrenado_el": "2026-10-22T22:08:05"
 }

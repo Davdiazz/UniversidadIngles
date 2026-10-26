@@ -2,16 +2,51 @@
 
 1. Tu página (`Universidad/universidad.html`) le hace al usuario una **encuesta de 10 palabras** sacadas del dataset de vocabulario CEFR-J.
 2. Las respuestas viajan junto a cada mensaje del chat al webhook `tutor-ingles`. En n8n, el nodo **"Predecir nivel (modelo ML)"**
-   (regresión logística entrenada por nosotros) calcula el nivel: principiante, básico, intermedio o avanzado.
+   se las manda a `servicio_modelo.py`, que carga el modelo entrenado (`models/modelo_nivel.joblib`, regresión logística de
+   scikit-learn) y devuelve el nivel: principiante, básico, intermedio o avanzado.
+   **Si el modelo no está entrenado o el servicio está apagado, n8n no llama a Groq** y el chat muestra el motivo.
 3. Ese nivel se pasa a **Groq**, que adapta cuánto inglés usa, el vocabulario y las correcciones, y refuerza las palabras que el usuario no supo.
 
 ```
 universidad.html ──POST tutor-ingles { message, conversationHistory, encuesta: { respuestas } }──►
-  n8n: Webhook1 → Predecir nivel (modelo ML) → Preparar mensajes y nivel → Armar prompt tutor → Llamar a Groq → Parsear respuesta
-  ◄── { response, nivel, prediccion: { nivel, probabilidades, aciertos, palabrasDesconocidas } }
+  n8n: Webhook1 → Predecir nivel (modelo ML) ──HTTP──► servicio_modelo.py (puerto 8001, modelo .joblib)
+       → ¿Modelo disponible? ─ sí → Preparar mensajes y nivel → Armar prompt tutor → Llamar a Groq → Parsear respuesta
+                              └ no → Avisar: modelo no disponible (no se llama a Groq)
+  ◄── { response, nivel, prediccion: { nivel, probabilidades, aciertos, palabrasDesconocidas, modelo } }
 ```
 
-No hace falta un servidor de Python: el modelo se entrena en Python y sus pesos quedan dentro del nodo Code de n8n.
+Para ver si el modelo está cargado y cuándo se entrenó: abre `http://localhost:8001/estado`.
+
+## Cómo correrlo (tu computador como servidor)
+
+Todo corre en **un solo servidor** (`servidor.py`, puerto 8080) que carga una vez el modelo de nivel y Whisper:
+
+| Ruta | Qué es |
+|---|---|
+| `/` | La página del tutor, ya configurada (no hay que pegar webhook) |
+| `/api/tutor` | El chat: reenvía cada mensaje a n8n. **n8n nunca queda expuesto a internet** |
+| `/modelo/estado`, `/modelo/predecir` | El modelo ML de nivel (`servicio_modelo.py`) |
+| `/stt/transcribe` | El micrófono, voz a texto (`stt_service.py`) |
+| `/api/estado` | Revisa de un vistazo modelo + n8n |
+
+```bash
+bash iniciar.sh           # local + internet (si configuraste NGROK_DOMAIN en .env)
+bash iniciar.sh --local   # solo en este computador: http://localhost:8080
+```
+n8n se abre aparte, con el workflow **activo** (el servidor usa la URL de producción `/webhook/tutor-ingles`).
+
+### Publicar en internet con ngrok (URL fija gratis)
+1. Crea una cuenta en https://ngrok.com e instala ngrok (`sudo snap install ngrok`).
+2. Copia tu authtoken del dashboard y ejecuta una sola vez: `ngrok config add-authtoken TU_TOKEN`
+3. En el dashboard ve a **Domains** y reclama tu dominio gratis (algo como `xxxx.ngrok-free.app`).
+4. `cp .env.example .env` y pon ese dominio en `NGROK_DOMAIN=`.
+5. `bash iniciar.sh` → comparte `https://TU_DOMINIO`. Funciona en celulares (con micrófono, porque es https).
+
+### Cada estudiante tiene su propia prueba
+La encuesta, el nivel y el identificador de sesión se guardan en el `localStorage` **del navegador de cada persona**
+y viajan con cada mensaje. El servidor y n8n no guardan estado compartido, así que varias personas pueden usarlo al
+mismo tiempo sin mezclarse. El botón **Encuesta de nivel** permite repetirla.
+Para no gastar tu cuota de Groq, cada visitante puede mandar máximo `LIMITE_MENSAJES_POR_MINUTO` mensajes (20 por defecto).
 
 ## Dataset
 
@@ -65,10 +100,14 @@ python3 -m venv venv
 venv/bin/pip install -r requirements.txt
 ./download_data.sh                    # descarga el vocabulario CEFR-J
 venv/bin/python train_model.py        # simula estudiantes, entrena, guarda models/modelo_nivel.json
-venv/bin/python n8n/build_workflows.py  # mete el banco y los pesos del modelo en los workflows
+venv/bin/python n8n/build_workflows.py  # genera n8n/workflow_tutor.json
+venv/bin/uvicorn servicio_modelo:app --port 8001   # sirve el modelo entrenado a n8n
 ```
 
-Si cambias el banco de palabras o reentrenas, corre los dos últimos comandos y vuelve a importar `n8n/workflow_tutor.json`.
+Prueba de que el tutor depende del modelo: apaga `servicio_modelo.py` (o borra `models/modelo_nivel.joblib`)
+y escribe en el chat: aparece "⚠️ El modelo de machine learning que calcula tu nivel NO está disponible…".
+
+Si reentrenas, reinicia `servicio_modelo.py` (o llama a `POST /recargar`). No hace falta reimportar el workflow.
 (Si cambias el banco, también hay que actualizar la constante `BANCO_VOCAB` en `universidad.html`.)
 
 ## Cómo ponerlo en n8n

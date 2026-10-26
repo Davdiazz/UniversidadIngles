@@ -1,11 +1,12 @@
 """
-Genera el workflow del tutor para n8n con el banco de palabras y los pesos del modelo ya incrustados.
+Genera el workflow del tutor para n8n. El nivel lo calcula el modelo entrenado (servicio_modelo.py):
+n8n le manda las respuestas de la encuesta por HTTP y, si el modelo no está disponible, avisa y no llama a Groq.
 Correr después de train_model.py (si reentrenas, vuelve a correr esto y reimporta):
     venv/bin/python n8n/build_workflows.py
 """
 
-import csv
 import json
+import os
 import uuid
 from pathlib import Path
 
@@ -15,11 +16,11 @@ AQUI = Path(__file__).parent
 # Desde qué páginas se puede llamar al webhook (CORS). "*" = cualquiera, así funciona abriendo
 # la página en local (http://localhost:5500) y también en GitHub Pages.
 ORIGEN_FRONTEND = "*"
+# Dónde corre el modelo ML entrenado. Por defecto, dentro de servidor.py (puerto 8080, ruta /modelo).
+# Si lo corres solo (uvicorn servicio_modelo:app --port 8001) usa MODELO_URL=http://localhost:8001
+# Si n8n corre en Docker usa: MODELO_URL=http://host.docker.internal:8080/modelo python n8n/build_workflows.py
+MODELO_URL = os.environ.get("MODELO_URL", "http://localhost:8080/modelo")
 GROQ_CREDENCIAL = {"groqApi": {"id": "MIar86booTIHpgaI", "name": "Groq account"}}
-
-with open(BASE / "data" / "banco_vocabulario.csv", encoding="utf-8") as f:
-    BANCO = list(csv.DictReader(f))
-MODELO = json.loads((BASE / "models" / "modelo_nivel.json").read_text())
 
 
 def nodo(nombre, tipo, version, x, params, y=0, **extra):
@@ -47,73 +48,56 @@ def cadena(*nombres):
     return {a: {"main": [[{"node": b, "type": "main", "index": 0}]]} for a, b in zip(nombres, nombres[1:])}
 
 
-BANCO_JS = "const BANCO = " + json.dumps(BANCO, ensure_ascii=False, indent=0).replace("\n", "") + ";"
-MODELO_JS = "const MODELO = " + json.dumps(MODELO) + ";"
-
 # ═══════════════════════════════════════════════════════════════════
-# NODO DEL MODELO ML (va dentro del workflow del tutor)
+# MODELO ML: n8n le pregunta el nivel a servicio_modelo.py (Python + scikit-learn)
 # ═══════════════════════════════════════════════════════════════════
 
-JS_PREDECIR = BANCO_JS + "\n" + MODELO_JS + r"""
+# Cuerpo que se manda al modelo: solo las respuestas de la encuesta
+BODY_MODELO = "={{ JSON.stringify({ respuestas: ($json.body && $json.body.encuesta && $json.body.encuesta.respuestas) || {} }) }}"
 
-// La página envía junto a cada mensaje: { encuesta: { respuestas: { "spoon": "cuchara", "gale": "No la conozco", ... } } }
-const body = $input.first().json.body || $input.first().json;
-const respuestas = (body.encuesta && body.encuesta.respuestas) || {};
-const NIVELES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+JS_RESULTADO_MODELO = r"""
+// Revisa qué contestó el servicio del modelo ML (servicio_modelo.py)
+const r = $input.first().json;
+const body = $('Webhook1').first().json.body || $('Webhook1').first().json;
 
-// Si el usuario no hizo la encuesta, seguimos sin predicción (se usa body.level o 'principiante')
-if (Object.keys(respuestas).length === 0) {
-  return [{ json: { body, prediccion: null } }];
-}
-
-const porPalabra = Object.fromEntries(BANCO.map(p => [p.palabra, p]));
-const aciertos = Object.fromEntries(NIVELES.map(n => [n, 0]));
-let noLaConozco = 0;
-let totalAciertos = 0;
-const palabrasDesconocidas = [];
-
-for (const [palabra, respuesta] of Object.entries(respuestas)) {
-  const p = porPalabra[palabra];
-  if (!p) continue;
-  if (respuesta === p.traduccion) {
-    aciertos[p.cefr] += 1;
-    totalAciertos += 1;
-  } else {
-    if (!respuesta || respuesta === 'No la conozco') noLaConozco += 1;
-    palabrasDesconocidas.push({ palabra: p.palabra, traduccion: p.traduccion, cefr: p.cefr });
+const respondio = r && Object.prototype.hasOwnProperty.call(r, 'nivel') && !r.error && !r.detail;
+if (!respondio) {
+  let motivo = r && (r.detail || (r.error && (r.error.message || r.error.description || JSON.stringify(r.error))));
+  if (!motivo || /ECONNREFUSED|connect/i.test(motivo)) {
+    motivo = 'El servidor del modelo no está encendido (servidor.py en el puerto 8080). ' + (motivo || '');
   }
+  return [{ json: { body, prediccion: null, modeloOk: false, motivo } }];
 }
 
-// Mismas variables (features) con las que se entrenó el modelo en train_model.py
-const totalPreguntas = Object.values(MODELO.preguntas_por_nivel).reduce((a, b) => a + b, 0);
-const x = [
-  ...NIVELES.map(n => aciertos[n] / MODELO.preguntas_por_nivel[n]),
-  noLaConozco / totalPreguntas
-];
+// r.nivel === null -> el usuario todavía no hizo la encuesta
+return [{ json: { body, prediccion: r.nivel ? r : null, modeloOk: true } }];
+"""
 
-// Regresión logística multinomial: puntaje por clase -> softmax -> probabilidades
-const puntajes = MODELO.coeficientes.map((w, k) =>
-  w.reduce((suma, wi, i) => suma + wi * x[i], MODELO.interceptos[k]));
-const maximo = Math.max(...puntajes);
-const exps = puntajes.map(s => Math.exp(s - maximo));
-const sumaExps = exps.reduce((a, b) => a + b, 0);
-const probabilidades = {};
-MODELO.clases.forEach((clase, k) => { probabilidades[clase] = Math.round((exps[k] / sumaExps) * 1000) / 1000; });
-
-const nivel = Object.entries(probabilidades).sort((a, b) => b[1] - a[1])[0][0];
-
+JS_MODELO_NO_DISPONIBLE = r"""
+const motivo = $input.first().json.motivo;
 return [{
   json: {
-    body,
-    prediccion: {
-      nivel,
-      probabilidades,
-      aciertos: `${totalAciertos}/${totalPreguntas}`,
-      palabrasDesconocidas
-    }
+    response: "⚠️ El modelo de machine learning que calcula tu nivel NO está disponible, así que no puedo empezar la tutoría.\n\n" +
+              "Motivo: " + motivo + "\n\n" +
+              "Solución: en la carpeta universidadIA ejecuta\n  python train_model.py   (si no está entrenado)\n  bash iniciar.sh",
+    nivel: null,
+    prediccion: null,
+    modeloError: motivo
   }
 }];
 """
+
+SI_MODELO_OK = {
+    "conditions": {
+        "options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose"},
+        "conditions": [{
+            "id": str(uuid.uuid4()), "leftValue": "={{ $json.modeloOk }}", "rightValue": "",
+            "operator": {"type": "boolean", "operation": "true", "singleValue": True},
+        }],
+        "combinator": "and",
+    },
+    "options": {},
+}
 
 # ═══════════════════════════════════════════════════════════════════
 # WORKFLOW: Tutor (tu workflow original + modelo ML de la encuesta)
@@ -127,7 +111,7 @@ const NIVELES_VALIDOS = ['principiante', 'basico', 'intermedio', 'avanzado'];
 
 return inputData.map(item => {
   const body = item.json.body || item.json;
-  const prediccion = item.json.prediccion;  // viene del nodo "Predecir nivel (modelo ML)"
+  const prediccion = item.json.prediccion;  // viene del nodo "Resultado del modelo" (servicio_modelo.py)
   const userMessage = body.message || "";
   const history = body.conversationHistory || [];
 
@@ -274,7 +258,7 @@ JS_PARSEAR = r"""
 const groqResponse = $input.first().json;
 const nivel = $('Preparar mensajes y nivel').first().json.nivel;
 // Resultado del modelo ML: la página lo usa para mostrar el nivel y las probabilidades
-const prediccion = $('Predecir nivel (modelo ML)').first().json.prediccion;
+const prediccion = $('Resultado del modelo').first().json.prediccion;
 
 if (!groqResponse || !groqResponse.choices || groqResponse.choices.length === 0) {
   return [{
@@ -302,20 +286,35 @@ wf_tutor = {
     "nodes": [
         {**webhook("Webhook1", "tutor-ingles", "POST"),
          "id": "7f18568d-98f0-4a47-ba50-f6ac3fb05ae5", "webhookId": "753a56a9-6777-454f-b239-454b5fb44ca7"},
-        code("Predecir nivel (modelo ML)", 224, JS_PREDECIR),
-        code("Preparar mensajes y nivel", 448, JS_PREPARAR),
-        code("Armar prompt tutor", 672, JS_ARMAR_PROMPT),
-        nodo("Llamar a Groq", "n8n-nodes-base.httpRequest", 4.3, 896, {
+        nodo("Predecir nivel (modelo ML)", "n8n-nodes-base.httpRequest", 4.2, 224, {
+            "method": "POST", "url": MODELO_URL + "/predecir",
+            "sendBody": True, "specifyBody": "json", "jsonBody": BODY_MODELO,
+            "options": {"timeout": 10000, "response": {"response": {"neverError": True}}},
+        }, onError="continueRegularOutput"),
+        code("Resultado del modelo", 448, JS_RESULTADO_MODELO),
+        nodo("¿Modelo disponible?", "n8n-nodes-base.if", 2, 672, SI_MODELO_OK),
+        code("Preparar mensajes y nivel", 896, JS_PREPARAR, y=-100),
+        code("Armar prompt tutor", 1120, JS_ARMAR_PROMPT, y=-100),
+        nodo("Llamar a Groq", "n8n-nodes-base.httpRequest", 4.3, 1344, {
             "method": "POST", "url": "https://api.groq.com/openai/v1/chat/completions",
             "authentication": "predefinedCredentialType", "nodeCredentialType": "groqApi",
             "sendHeaders": True, "headerParameters": {"parameters": [{"name": "Content-Type", "value": "application/json"}]},
             "sendBody": True, "specifyBody": "json", "jsonBody": "={{ $json }}", "options": {},
-        }, credentials=GROQ_CREDENCIAL),
-        code("Parsear respuesta", 1120, JS_PARSEAR),
-        responder("Respond to Webhook", 1344),
+        }, y=-100, credentials=GROQ_CREDENCIAL),
+        code("Parsear respuesta", 1568, JS_PARSEAR, y=-100),
+        responder("Respond to Webhook", 1792, y=-100),
+        code("Avisar: modelo no disponible", 896, JS_MODELO_NO_DISPONIBLE, y=150),
+        responder("Responder error del modelo", 1120, y=150),
     ],
-    "connections": cadena("Webhook1", "Predecir nivel (modelo ML)", "Preparar mensajes y nivel", "Armar prompt tutor",
-                          "Llamar a Groq", "Parsear respuesta", "Respond to Webhook"),
+    "connections": {
+        **cadena("Webhook1", "Predecir nivel (modelo ML)", "Resultado del modelo", "¿Modelo disponible?"),
+        "¿Modelo disponible?": {"main": [
+            [{"node": "Preparar mensajes y nivel", "type": "main", "index": 0}],
+            [{"node": "Avisar: modelo no disponible", "type": "main", "index": 0}],
+        ]},
+        **cadena("Preparar mensajes y nivel", "Armar prompt tutor", "Llamar a Groq", "Parsear respuesta", "Respond to Webhook"),
+        **cadena("Avisar: modelo no disponible", "Responder error del modelo"),
+    },
     "pinData": {},
     "settings": {"executionOrder": "v1"},
 }

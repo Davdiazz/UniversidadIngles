@@ -22,20 +22,33 @@
     },
     {
       "parameters": {
-        "jsCode": "const BANCO = [{\"palabra\": \"bed\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"cama\"},{\"palabra\": \"chair\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"silla\"},{\"palabra\": \"shirt\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"camisa\"},{\"palabra\": \"woman\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"mujer\"},{\"palabra\": \"hill\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"colina\"},{\"palabra\": \"trousers\",\"pos\": \"noun\",\"cefr\": \"A1\",\"traduccion\": \"pantalones\"},{\"palabra\": \"wait\",\"pos\": \"verb\",\"cefr\": \"A1\",\"traduccion\": \"esperar\"},{\"palabra\": \"finish\",\"pos\": \"verb\",\"cefr\": \"A1\",\"traduccion\": \"terminar\"},{\"palabra\": \"heavy\",\"pos\": \"adjective\",\"cefr\": \"A1\",\"traduccion\": \"pesado\"},{\"palabra\": \"thin\",\"pos\": \"adjective\",\"cefr\": \"A1\",\"traduccion\": \"delgado\"},{\"palabra\": \"clever\",\"pos\": \"adjective\",\"cefr\": \"A1\",\"traduccion\": \"inteligente\"},{\"palabra\": \"sunny\",\"pos\": \"adjective\",\"cefr\": \"A1\",\"traduccion\": \"soleado\"},{\"palabra\": \"spoon\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"cuchara\"},{\"palabra\": \"envelope\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"sobre (de carta)\"},{\"palabra\": \"weight\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"peso\"},{\"palabra\": \"silver\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"plata\"},{\"palabra\": \"beginning\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"comienzo\"},{\"palabra\": \"drawing\",\"pos\": \"noun\",\"cefr\": \"A2\",\"traduccion\": \"dibujo\"},{\"palabra\": \"shut\",\"pos\": \"verb\",\"cefr\": \"A2\",\"traduccion\": \"cerrar\"},{\"palabra\": \"hug\",\"pos\": \"verb\",\"cefr\": \"A2\",\"traduccion\": \"abrazar\"},{\"palabra\": \"worried\",\"pos\": \"adjective\",\"cefr\": \"A2\",\"traduccion\": \"preocupado\"},{\"palabra\": \"loose\",\"pos\": \"adjective\",\"cefr\": \"A2\",\"traduccion\": \"suelto\"},{\"palabra\": \"worse\",\"pos\": \"adjective\",\"cefr\": \"A2\",\"traduccion\": \"peor\"},{\"palabra\": \"sleepless\",\"pos\": \"adjective\",\"cefr\": \"A2\",\"traduccion\": \"sin dormir\"},{\"palabra\": \"praise\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"elogio\"},{\"palabra\": \"guilt\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"culpa\"},{\"palabra\": \"army\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"ejército\"},{\"palabra\": \"blessing\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"bendición\"},{\"palabra\": \"calf\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"ternero\"},{\"palabra\": \"tracksuit\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"sudadera deportiva\"},{\"palabra\": \"pillow\",\"pos\": \"noun\",\"cefr\": \"B1\",\"traduccion\": \"almohada\"},{\"palabra\": \"jealous\",\"pos\": \"adjective\",\"cefr\": \"B1\",\"traduccion\": \"celoso\"},{\"palabra\": \"aid\",\"pos\": \"verb\",\"cefr\": \"B1\",\"traduccion\": \"ayudar\"},{\"palabra\": \"breathless\",\"pos\": \"adjective\",\"cefr\": \"B1\",\"traduccion\": \"sin aliento\"},{\"palabra\": \"newborn\",\"pos\": \"adjective\",\"cefr\": \"B1\",\"traduccion\": \"recién nacido\"},{\"palabra\": \"flat\",\"pos\": \"adjective\",\"cefr\": \"B1\",\"traduccion\": \"plano\"},{\"palabra\": \"thirst\",\"pos\": \"noun\",\"cefr\": \"B2\",\"traduccion\": \"sed\"},{\"palabra\": \"throat\",\"pos\": \"noun\",\"cefr\": \"B2\",\"traduccion\": \"garganta\"},{\"palabra\": \"hood\",\"pos\": \"noun\",\"cefr\": \"B2\",\"traduccion\": \"capucha\"},{\"palabra\": \"craftsman\",\"pos\": \"noun\",\"cefr\": \"B2\",\"traduccion\": \"artesano\"},{\"palabra\": \"tickle\",\"pos\": \"verb\",\"cefr\": \"B2\",\"traduccion\": \"hacer cosquillas\"},{\"palabra\": \"rub\",\"pos\": \"verb\",\"cefr\": \"B2\",\"traduccion\": \"frotar\"},{\"palabra\": \"unload\",\"pos\": \"verb\",\"cefr\": \"B2\",\"traduccion\": \"descargar\"},{\"palabra\": \"dreadful\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"espantoso\"},{\"palabra\": \"bossy\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"mandón\"},{\"palabra\": \"bustling\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"bullicioso\"},{\"palabra\": \"truthful\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"sincero\"},{\"palabra\": \"unreliable\",\"pos\": \"adjective\",\"cefr\": \"B2\",\"traduccion\": \"poco confiable\"},{\"palabra\": \"inheritance\",\"pos\": \"noun\",\"cefr\": \"C1\",\"traduccion\": \"herencia\"},{\"palabra\": \"honk\",\"pos\": \"noun\",\"cefr\": \"C1\",\"traduccion\": \"bocinazo\"},{\"palabra\": \"suds\",\"pos\": \"noun\",\"cefr\": \"C1\",\"traduccion\": \"espuma de jabón\"},{\"palabra\": \"slob\",\"pos\": \"noun\",\"cefr\": \"C1\",\"traduccion\": \"persona desaliñada\"},{\"palabra\": \"gnaw\",\"pos\": \"verb\",\"cefr\": \"C1\",\"traduccion\": \"roer\"},{\"palabra\": \"aimless\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"sin rumbo\"},{\"palabra\": \"scathing\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"mordaz\"},{\"palabra\": \"engrossing\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"absorbente\"},{\"palabra\": \"vicious\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"despiadado\"},{\"palabra\": \"unsettling\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"perturbador\"},{\"palabra\": \"effortless\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"sin esfuerzo\"},{\"palabra\": \"unwavering\",\"pos\": \"adjective\",\"cefr\": \"C1\",\"traduccion\": \"inquebrantable\"},{\"palabra\": \"bauble\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"baratija\"},{\"palabra\": \"hull\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"casco (de un barco)\"},{\"palabra\": \"vermin\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"alimañas\"},{\"palabra\": \"gale\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"vendaval\"},{\"palabra\": \"shoal\",\"pos\": \"noun\",\"cefr\": \"C2\",\"traduccion\": \"banco de peces\"},{\"palabra\": \"quiver\",\"pos\": \"verb\",\"cefr\": \"C2\",\"traduccion\": \"temblar\"},{\"palabra\": \"mangle\",\"pos\": \"verb\",\"cefr\": \"C2\",\"traduccion\": \"destrozar\"},{\"palabra\": \"brim\",\"pos\": \"verb\",\"cefr\": \"C2\",\"traduccion\": \"rebosar\"},{\"palabra\": \"elated\",\"pos\": \"adjective\",\"cefr\": \"C2\",\"traduccion\": \"eufórico\"},{\"palabra\": \"tetchy\",\"pos\": \"adjective\",\"cefr\": \"C2\",\"traduccion\": \"irritable\"},{\"palabra\": \"hapless\",\"pos\": \"adjective\",\"cefr\": \"C2\",\"traduccion\": \"desdichado\"},{\"palabra\": \"daunting\",\"pos\": \"adjective\",\"cefr\": \"C2\",\"traduccion\": \"intimidante\"}];\nconst MODELO = {\"tipo\": \"regresion_logistica_multinomial\", \"features\": [\"acierto_A1\", \"acierto_A2\", \"acierto_B1\", \"acierto_B2\", \"acierto_C1\", \"acierto_C2\", \"pct_no_la_conozco\"], \"clases\": [\"avanzado\", \"basico\", \"intermedio\", \"principiante\"], \"coeficientes\": [[1.56117, 2.0025, 3.55768, 3.61573, 1.41766, 1.0516, -2.49446], [-0.2735, -0.79408, -1.60619, -1.81675, -0.79159, -0.28953, 0.71181], [1.0031, 1.71244, 1.31046, 0.53843, -0.13203, -0.32503, 0.06291], [-2.29077, -2.92086, -3.26195, -2.33741, -0.49403, -0.43704, 1.71975]], \"interceptos\": [-8.3471, 3.74384, -2.09648, 6.69974], \"preguntas_por_nivel\": {\"A1\": 2, \"A2\": 2, \"B1\": 2, \"B2\": 2, \"C1\": 1, \"C2\": 1}, \"exactitud_prueba\": 0.717};\n\n// La página envía junto a cada mensaje: { encuesta: { respuestas: { \"spoon\": \"cuchara\", \"gale\": \"No la conozco\", ... } } }\nconst body = $input.first().json.body || $input.first().json;\nconst respuestas = (body.encuesta && body.encuesta.respuestas) || {};\nconst NIVELES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];\n\n// Si el usuario no hizo la encuesta, seguimos sin predicción (se usa body.level o 'principiante')\nif (Object.keys(respuestas).length === 0) {\n  return [{ json: { body, prediccion: null } }];\n}\n\nconst porPalabra = Object.fromEntries(BANCO.map(p => [p.palabra, p]));\nconst aciertos = Object.fromEntries(NIVELES.map(n => [n, 0]));\nlet noLaConozco = 0;\nlet totalAciertos = 0;\nconst palabrasDesconocidas = [];\n\nfor (const [palabra, respuesta] of Object.entries(respuestas)) {\n  const p = porPalabra[palabra];\n  if (!p) continue;\n  if (respuesta === p.traduccion) {\n    aciertos[p.cefr] += 1;\n    totalAciertos += 1;\n  } else {\n    if (!respuesta || respuesta === 'No la conozco') noLaConozco += 1;\n    palabrasDesconocidas.push({ palabra: p.palabra, traduccion: p.traduccion, cefr: p.cefr });\n  }\n}\n\n// Mismas variables (features) con las que se entrenó el modelo en train_model.py\nconst totalPreguntas = Object.values(MODELO.preguntas_por_nivel).reduce((a, b) => a + b, 0);\nconst x = [\n  ...NIVELES.map(n => aciertos[n] / MODELO.preguntas_por_nivel[n]),\n  noLaConozco / totalPreguntas\n];\n\n// Regresión logística multinomial: puntaje por clase -> softmax -> probabilidades\nconst puntajes = MODELO.coeficientes.map((w, k) =>\n  w.reduce((suma, wi, i) => suma + wi * x[i], MODELO.interceptos[k]));\nconst maximo = Math.max(...puntajes);\nconst exps = puntajes.map(s => Math.exp(s - maximo));\nconst sumaExps = exps.reduce((a, b) => a + b, 0);\nconst probabilidades = {};\nMODELO.clases.forEach((clase, k) => { probabilidades[clase] = Math.round((exps[k] / sumaExps) * 1000) / 1000; });\n\nconst nivel = Object.entries(probabilidades).sort((a, b) => b[1] - a[1])[0][0];\n\nreturn [{\n  json: {\n    body,\n    prediccion: {\n      nivel,\n      probabilidades,\n      aciertos: `${totalAciertos}/${totalPreguntas}`,\n      palabrasDesconocidas\n    }\n  }\n}];"
+        "method": "POST",
+        "url": "http://localhost:8080/modelo/predecir",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ respuestas: ($json.body && $json.body.encuesta && $json.body.encuesta.respuestas) || {} }) }}",
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
       },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         224,
         0
       ],
-      "id": "d340bed0-ea4d-4d6e-a8d3-a9f5a72a6e79",
-      "name": "Predecir nivel (modelo ML)"
+      "id": "db09ab70-2602-47d0-849b-db537cdb54d9",
+      "name": "Predecir nivel (modelo ML)",
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
-        "jsCode": "const inputData = $input.all();\n\n// Niveles válidos que el frontend puede enviar en body.level\nconst NIVELES_VALIDOS = ['principiante', 'basico', 'intermedio', 'avanzado'];\n\nreturn inputData.map(item => {\n  const body = item.json.body || item.json;\n  const prediccion = item.json.prediccion;  // viene del nodo \"Predecir nivel (modelo ML)\"\n  const userMessage = body.message || \"\";\n  const history = body.conversationHistory || [];\n\n  // Nivel: el que predijo el modelo ML con la encuesta. Si no hay encuesta, el que mande la página\n  // en body.level, y si tampoco, 'principiante' para no asumir un nivel que no tiene.\n  let nivel = ((prediccion && prediccion.nivel) || body.level || '').toLowerCase().trim();\n  if (!NIVELES_VALIDOS.includes(nivel)) {\n    nivel = 'principiante';\n  }\n\n  // Palabras que el estudiante no supo en la encuesta\n  const palabrasDesconocidas = ((prediccion && prediccion.palabrasDesconocidas) || []).slice(0, 10);\n\n  const messages = [];\n\n  const recentHistory = history.slice(-10).filter(msg => {\n    return msg.content &&\n           !msg.content.includes('={{ $json') &&\n           !msg.content.includes('={{') &&\n           msg.content.trim().length > 0;\n  });\n\n  recentHistory.forEach(msg => {\n    messages.push({\n      role: msg.role === 'user' ? 'user' : 'assistant',\n      content: msg.content\n    });\n  });\n\n  messages.push({\n    role: 'user',\n    content: userMessage\n  });\n\n  return {\n    json: {\n      messages: messages,\n      nivel: nivel,\n      aciertosEncuesta: prediccion ? prediccion.aciertos : null,\n      palabrasDesconocidas: palabrasDesconocidas,\n      esPrimerMensaje: recentHistory.length === 0\n    }\n  };\n});"
+        "jsCode": "// Revisa qué contestó el servicio del modelo ML (servicio_modelo.py)\nconst r = $input.first().json;\nconst body = $('Webhook1').first().json.body || $('Webhook1').first().json;\n\nconst respondio = r && Object.prototype.hasOwnProperty.call(r, 'nivel') && !r.error && !r.detail;\nif (!respondio) {\n  let motivo = r && (r.detail || (r.error && (r.error.message || r.error.description || JSON.stringify(r.error))));\n  if (!motivo || /ECONNREFUSED|connect/i.test(motivo)) {\n    motivo = 'El servidor del modelo no está encendido (servidor.py en el puerto 8080). ' + (motivo || '');\n  }\n  return [{ json: { body, prediccion: null, modeloOk: false, motivo } }];\n}\n\n// r.nivel === null -> el usuario todavía no hizo la encuesta\nreturn [{ json: { body, prediccion: r.nivel ? r : null, modeloOk: true } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -43,7 +56,53 @@
         448,
         0
       ],
-      "id": "77a2be21-9684-4388-9b92-51619ef7f42e",
+      "id": "4add4691-cf26-4c6d-b510-282999af8575",
+      "name": "Resultado del modelo"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "b642ad6c-3b3b-4d9a-8b00-a2a3bca7b8e4",
+              "leftValue": "={{ $json.modeloOk }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "e569dd4c-66b7-438b-8f9d-23fe6a85b8f1",
+      "name": "¿Modelo disponible?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\n// Niveles válidos que el frontend puede enviar en body.level\nconst NIVELES_VALIDOS = ['principiante', 'basico', 'intermedio', 'avanzado'];\n\nreturn inputData.map(item => {\n  const body = item.json.body || item.json;\n  const prediccion = item.json.prediccion;  // viene del nodo \"Resultado del modelo\" (servicio_modelo.py)\n  const userMessage = body.message || \"\";\n  const history = body.conversationHistory || [];\n\n  // Nivel: el que predijo el modelo ML con la encuesta. Si no hay encuesta, el que mande la página\n  // en body.level, y si tampoco, 'principiante' para no asumir un nivel que no tiene.\n  let nivel = ((prediccion && prediccion.nivel) || body.level || '').toLowerCase().trim();\n  if (!NIVELES_VALIDOS.includes(nivel)) {\n    nivel = 'principiante';\n  }\n\n  // Palabras que el estudiante no supo en la encuesta\n  const palabrasDesconocidas = ((prediccion && prediccion.palabrasDesconocidas) || []).slice(0, 10);\n\n  const messages = [];\n\n  const recentHistory = history.slice(-10).filter(msg => {\n    return msg.content &&\n           !msg.content.includes('={{ $json') &&\n           !msg.content.includes('={{') &&\n           msg.content.trim().length > 0;\n  });\n\n  recentHistory.forEach(msg => {\n    messages.push({\n      role: msg.role === 'user' ? 'user' : 'assistant',\n      content: msg.content\n    });\n  });\n\n  messages.push({\n    role: 'user',\n    content: userMessage\n  });\n\n  return {\n    json: {\n      messages: messages,\n      nivel: nivel,\n      aciertosEncuesta: prediccion ? prediccion.aciertos : null,\n      palabrasDesconocidas: palabrasDesconocidas,\n      esPrimerMensaje: recentHistory.length === 0\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -100
+      ],
+      "id": "7eb8e4ca-587f-4a6a-915f-2831d24af26b",
       "name": "Preparar mensajes y nivel"
     },
     {
@@ -53,10 +112,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        672,
-        0
+        1120,
+        -100
       ],
-      "id": "afbb07db-e05d-4688-ace4-dfb3712a19e7",
+      "id": "95a5d6f5-c749-4234-8408-158391fe96b2",
       "name": "Armar prompt tutor"
     },
     {
@@ -82,10 +141,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        896,
-        0
+        1344,
+        -100
       ],
-      "id": "c70a686c-89b5-4891-9ead-141af760e905",
+      "id": "1897177b-5969-4efa-b7b8-b2ba93226d62",
       "name": "Llamar a Groq",
       "credentials": {
         "groqApi": {
@@ -96,15 +155,15 @@
     },
     {
       "parameters": {
-        "jsCode": "const groqResponse = $input.first().json;\nconst nivel = $('Preparar mensajes y nivel').first().json.nivel;\n// Resultado del modelo ML: la página lo usa para mostrar el nivel y las probabilidades\nconst prediccion = $('Predecir nivel (modelo ML)').first().json.prediccion;\n\nif (!groqResponse || !groqResponse.choices || groqResponse.choices.length === 0) {\n  return [{\n    json: {\n      response: \"Lo siento, hubo un error al procesar tu mensaje. Por favor intenta de nuevo.\",\n      nivel: nivel,\n      prediccion: prediccion\n    }\n  }];\n}\n\nconst aiMessage = groqResponse.choices[0].message.content;\n\nreturn [{\n  json: {\n    response: aiMessage,\n    nivel: nivel,\n    prediccion: prediccion\n  }\n}];"
+        "jsCode": "const groqResponse = $input.first().json;\nconst nivel = $('Preparar mensajes y nivel').first().json.nivel;\n// Resultado del modelo ML: la página lo usa para mostrar el nivel y las probabilidades\nconst prediccion = $('Resultado del modelo').first().json.prediccion;\n\nif (!groqResponse || !groqResponse.choices || groqResponse.choices.length === 0) {\n  return [{\n    json: {\n      response: \"Lo siento, hubo un error al procesar tu mensaje. Por favor intenta de nuevo.\",\n      nivel: nivel,\n      prediccion: prediccion\n    }\n  }];\n}\n\nconst aiMessage = groqResponse.choices[0].message.content;\n\nreturn [{\n  json: {\n    response: aiMessage,\n    nivel: nivel,\n    prediccion: prediccion\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1120,
-        0
+        1568,
+        -100
       ],
-      "id": "c4cc4f28-c318-4e92-b1c1-a44cb201d1b7",
+      "id": "170a700c-f93c-4b7a-93fb-6526e0bdaa13",
       "name": "Parsear respuesta"
     },
     {
@@ -116,11 +175,39 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        1344,
-        0
+        1792,
+        -100
       ],
-      "id": "4cd4b9cc-85dd-4740-b148-436d16ee9a89",
+      "id": "0ccdc80e-9f73-4127-890d-ee83ff6b355c",
       "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const motivo = $input.first().json.motivo;\nreturn [{\n  json: {\n    response: \"⚠️ El modelo de machine learning que calcula tu nivel NO está disponible, así que no puedo empezar la tutoría.\\n\\n\" +\n              \"Motivo: \" + motivo + \"\\n\\n\" +\n              \"Solución: en la carpeta universidadIA ejecuta\\n  python train_model.py   (si no está entrenado)\\n  bash iniciar.sh\",\n    nivel: null,\n    prediccion: null,\n    modeloError: motivo\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        150
+      ],
+      "id": "e60a6ff1-0a5d-4f10-9e0b-df16e383df43",
+      "name": "Avisar: modelo no disponible"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1120,
+        150
+      ],
+      "id": "60515a03-ee0d-4f19-9642-113f46e7aef9",
+      "name": "Responder error del modelo"
     }
   ],
   "connections": {
@@ -139,7 +226,36 @@
       "main": [
         [
           {
+            "node": "Resultado del modelo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resultado del modelo": {
+      "main": [
+        [
+          {
+            "node": "¿Modelo disponible?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Modelo disponible?": {
+      "main": [
+        [
+          {
             "node": "Preparar mensajes y nivel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar: modelo no disponible",
             "type": "main",
             "index": 0
           }
@@ -184,6 +300,17 @@
         [
           {
             "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Avisar: modelo no disponible": {
+      "main": [
+        [
+          {
+            "node": "Responder error del modelo",
             "type": "main",
             "index": 0
           }

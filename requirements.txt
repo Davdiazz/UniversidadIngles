@@ -1,3 +1,11 @@
 pandas
+numpy
 scikit-learn
 joblib
+fastapi
+uvicorn
+httpx
+faster-whisper
+# av 19 quitó un parámetro que usa faster-whisper (metadata_errors) -> se fija la 18
+av<19
+python-multipart
